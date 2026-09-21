@@ -1,0 +1,10 @@
+import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { BudgetProgress } from '../components/BudgetProgress'
+import { useFinance } from '../state/FinanceContext'
+import { calculateBudgetUsage } from '../utils/calculations'
+
+export function BudgetPage() {
+  const { budgets, validTransactions: transactions, addBudget, updateBudget, deleteBudget } = useFinance()
+  const createBudget = () => { const category = window.prompt('კატეგორია'); const limit = Number(window.prompt('თვიური ლიმიტი', '500')); if (!category?.trim() || !Number.isFinite(limit) || limit <= 0) return; addBudget({ category: category.trim(), limit, month: '2026-09' }) }
+  return <div className="space-y-6"><div className="flex items-center justify-between gap-3"><div><p className="text-sm uppercase tracking-[0.2em] text-slate-500">ბიუჯეტი</p><h1 className="mt-2 text-3xl font-bold text-slate-900">მთვიური ხარჯები</h1></div><button type="button" onClick={createBudget} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 font-medium text-white"><Plus className="h-4 w-4" />ბიუჯეტის დამატება</button></div><div className="grid gap-4 md:grid-cols-2">{budgets.map((item) => { const spent = calculateBudgetUsage(item, transactions); const id = item.id ?? item.category; return <div key={id} className="relative"><BudgetProgress category={item.category} spent={spent} limit={item.limit} /><div className="absolute right-3 top-3 flex gap-1"><button type="button" onClick={() => { const limit = Number(window.prompt('ახალი ლიმიტი', String(item.limit))); if (Number.isFinite(limit) && limit > 0 && item.id) updateBudget(item.id, { ...item, limit }) }} className="rounded-lg bg-white/80 p-2 text-slate-500" aria-label="ბიუჯეტის რედაქტირება"><Pencil className="h-4 w-4" /></button><button type="button" onClick={() => { if (window.confirm('ნამდვილად გსურთ ბიუჯეტის წაშლა?') && item.id) deleteBudget(item.id) }} className="rounded-lg bg-white/80 p-2 text-rose-600" aria-label="ბიუჯეტის წაშლა"><Trash2 className="h-4 w-4" /></button></div></div> })}</div></div>
+}
