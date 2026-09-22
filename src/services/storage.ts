@@ -14,10 +14,13 @@ export interface FinanceStateData {
 
 const STORAGE_KEY = 'finance-app-data'
 const STORAGE_VERSION = 1
+const LEGACY_IMPORT_OWNER_KEY = 'finance-app-data-imported-by'
+const storageKey = (userId?: string) => userId ? `${STORAGE_KEY}:${userId}` : STORAGE_KEY
 
 interface StoredData {
   version: number
   data: FinanceStateData
+  ownerId?: string
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null
@@ -30,9 +33,9 @@ const memberFallbackDate = (memberId: string, transactions: Transaction[]) => {
   return memberDates[0] ?? allDates[0] ?? '1970-01-01'
 }
 
-export function loadFinanceState(seed: FinanceStateData): FinanceStateData {
+export function loadFinanceState(seed: FinanceStateData, userId?: string): FinanceStateData {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(storageKey(userId))
     if (!raw) return seed
     const parsed: unknown = JSON.parse(raw)
     if (!isRecord(parsed) || parsed.version !== STORAGE_VERSION || !isRecord(parsed.data)) return seed
@@ -50,13 +53,31 @@ export function loadFinanceState(seed: FinanceStateData): FinanceStateData {
   }
 }
 
-export function saveFinanceState(data: FinanceStateData) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: STORAGE_VERSION, data } satisfies StoredData))
+export function getFinanceStorageInfo(userId?: string) {
+  try {
+    const raw = localStorage.getItem(storageKey(userId))
+    if (!raw) return { exists: false, ownerId: undefined }
+    const parsed: unknown = JSON.parse(raw)
+    return { exists: true, ownerId: isRecord(parsed) && typeof parsed.ownerId === 'string' ? parsed.ownerId : undefined }
+  } catch {
+    return { exists: true, ownerId: undefined }
+  }
 }
 
-export function clearFinanceState() {
-  localStorage.removeItem(STORAGE_KEY)
+export function saveFinanceState(data: FinanceStateData, ownerId?: string) {
+  localStorage.setItem(storageKey(ownerId), JSON.stringify({ version: STORAGE_VERSION, data, ownerId } satisfies StoredData))
 }
+
+export function clearFinanceState(userId: string) {
+  localStorage.removeItem(storageKey(userId))
+}
+
+const pendingKey = (userId: string) => `finance-sync-pending:${userId}`
+export const hasPendingFinanceSync = (userId: string) => localStorage.getItem(pendingKey(userId)) === 'true'
+export const markPendingFinanceSync = (userId: string) => localStorage.setItem(pendingKey(userId), 'true')
+export const clearPendingFinanceSync = (userId: string) => localStorage.removeItem(pendingKey(userId))
+export const getLegacyImportOwner = () => localStorage.getItem(LEGACY_IMPORT_OWNER_KEY)
+export const markLegacyFinanceImported = (userId: string) => localStorage.setItem(LEGACY_IMPORT_OWNER_KEY, userId)
 
 export function parseFinanceBackup(value: unknown, seed: FinanceStateData): FinanceStateData | null {
   try {

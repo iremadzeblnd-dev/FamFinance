@@ -1,4 +1,4 @@
-import { BarChart3, CreditCard, Landmark, PiggyBank, ReceiptText, Settings, Wallet, Users, House, CircleDollarSign, FileText, ShoppingCart } from 'lucide-react'
+﻿import { BarChart3, CreditCard, PiggyBank, ReceiptText, Settings, Wallet, Users, House, CircleDollarSign, FileText, ShoppingCart } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useFinance } from '../state/FinanceContext'
 import { translate } from '../i18n/translations'
@@ -19,7 +19,7 @@ export function Sidebar() {
       <div>
         <div className="mb-8 flex items-center gap-3 px-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-            <Landmark className="h-5 w-5" />
+            <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
           </div>
           <div>
             <p className="text-lg font-bold text-slate-900">ჩვენი ფინანსები</p>

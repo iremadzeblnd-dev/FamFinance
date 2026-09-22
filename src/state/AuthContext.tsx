@@ -1,13 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { authService, type AuthUser } from '../services/authService'
+import { authService, type AuthUser, type RegistrationResult } from '../services/authService'
 
 interface AuthContextValue {
   user: AuthUser | null
   checking: boolean
   configured: boolean
   login: (email: string, password: string, rememberMe: boolean) => Promise<void>
-  register: (fullName: string, email: string, password: string) => Promise<void>
+  register: (fullName: string, email: string, password: string) => Promise<RegistrationResult>
+  resendConfirmation: (email: string) => Promise<void>
   forgotPassword: (email: string) => Promise<void>
+  updatePassword: (password: string) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -31,8 +33,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checking,
     configured: authService.configured,
     login: async (email, password, rememberMe) => { const current = await authService.login(email, password, rememberMe); setUser(current) },
-    register: authService.register,
+    register: async (fullName, email, password) => {
+      const result = await authService.register(fullName, email, password)
+      if (!result.requiresEmailConfirmation) setUser(await authService.session())
+      return result
+    },
+    resendConfirmation: authService.resendConfirmation,
     forgotPassword: authService.forgotPassword,
+    updatePassword: authService.updatePassword,
     logout: async () => { await authService.logout(); setUser(null) },
   }), [checking, user])
 

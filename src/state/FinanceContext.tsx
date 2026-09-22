@@ -1,27 +1,32 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { accounts as seedAccounts, budgetData, familyMembers as seedMembers, installmentData, savingsGoals as seedGoals, transactions as seedTransactions } from '../data/mockData'
-import { loadFinanceState, saveFinanceState, clearFinanceState, parseFinanceBackup, type FinanceStateData } from '../services/storage'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { clearPendingFinanceSync, getFinanceStorageInfo, getLegacyImportOwner, hasPendingFinanceSync, loadFinanceState, markLegacyFinanceImported, markPendingFinanceSync, parseFinanceBackup, saveFinanceState, type FinanceStateData } from '../services/storage'
 import type { Account, AppPreferences, Budget, Currency, Debt, FamilyMember, SavingsGoal, ShoppingItem, Transaction, TransactionType } from '../types/app'
 import type { Language, Theme } from '../i18n/translations'
 import { deleteAttachmentBlobs } from '../services/attachmentStorage'
 import { defaultExpenseCategories, defaultIncomeCategories } from '../data/categories'
+import { fetchFinanceState, importLocalFinanceState, replaceFinanceState } from '../services/financeDatabase'
+import { useAuth } from './AuthContext'
 
 const now = () => new Date().toISOString()
 const makeId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-const earliestMemberDate = (memberId: string) => seedTransactions.filter((item) => item.familyMemberId === memberId).map((item) => item.date).sort()[0] ?? '1970-01-01'
 
-const seedState: FinanceStateData = {
-  transactions: seedTransactions.map((item) => ({ ...item, createdAt: now(), updatedAt: now() })),
-  accounts: seedAccounts.map((item) => ({ ...item, openingBalance: (item.balance ?? 0) - seedTransactions.filter((transaction) => transaction.accountId === item.id).reduce((sum, transaction) => sum + (transaction.type === 'income' ? transaction.amount : -transaction.amount), 0) })),
-  budgets: budgetData.map((item, index) => ({ id: `budget-${index + 1}`, category: item.category, limit: item.limit, month: '2026-09' })),
-  familyMembers: seedMembers.map(({ id, name }) => ({ id, name, createdAt: earliestMemberDate(id) })),
-  debts: installmentData,
-  savingsGoals: seedGoals.map(({ id, name, targetAmount, targetDate, linkedAccountId }) => ({ id, name, targetAmount, targetDate, linkedAccountId })),
+const emptyState: FinanceStateData = {
+  transactions: [],
+  accounts: [],
+  budgets: [],
+  familyMembers: [],
+  debts: [],
+  savingsGoals: [],
   shoppingItems: [],
   preferences: { theme: 'light', language: 'ka', currency: 'GEL', readNotificationIds: [], notifications: { enabled: true, debts: true, budgets: true, savings: true, reminders: true }, financialPeriodStartDay: 1, incomeCategories: defaultIncomeCategories, expenseCategories: defaultExpenseCategories, hideNotificationAmounts: false },
 }
 
 interface FinanceContextValue extends FinanceStateData {
+  dataLoading: boolean
+  dataLoadFailed: boolean
+  syncError: string
+  legacyImportAvailable: boolean
+  importLegacyData: () => Promise<boolean>
   validTransactions: Transaction[]
   addTransaction: (input: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => Transaction
   updateTransaction: (id: string, input: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => void
@@ -57,19 +62,124 @@ interface FinanceContextValue extends FinanceStateData {
   updatePreferences: (input: Partial<AppPreferences>) => void
   restoreFinanceData: (input: unknown) => boolean
   clearAllData: () => void
-  resetDemoData: () => void
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null)
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<FinanceStateData>(() => loadFinanceState(seedState))
+  const { user, checking: authChecking } = useAuth()
+  const userId = user?.id
+  const [state, setState] = useState<FinanceStateData>(emptyState)
+  const [hydratedUserId, setHydratedUserId] = useState<string | null>(null)
+  const [dataLoadFailed, setDataLoadFailed] = useState(false)
+  const [syncError, setSyncError] = useState('')
+  const [legacyImportAvailable, setLegacyImportAvailable] = useState(() => {
+    if (!userId || getLegacyImportOwner()) return false
+    const legacyStorage = getFinanceStorageInfo()
+    return legacyStorage.exists && (!legacyStorage.ownerId || legacyStorage.ownerId === userId)
+  })
+  const lastSyncedSnapshot = useRef('')
+  const latestSnapshot = useRef('')
+  const syncQueue = useRef<Promise<void>>(Promise.resolve())
+  const dataLoading = authChecking || Boolean(userId && hydratedUserId !== userId && !dataLoadFailed)
 
-  useEffect(() => saveFinanceState(state), [state])
   useEffect(() => {
     document.documentElement.dataset.theme = state.preferences.theme
     document.documentElement.lang = state.preferences.language === 'ka' ? 'ka' : state.preferences.language
   }, [state.preferences])
+
+  useEffect(() => {
+    if (authChecking) return
+    if (!userId) {
+      setHydratedUserId(null)
+      return
+    }
+    let active = true
+    const hydrate = async () => {
+      setSyncError('')
+      setDataLoadFailed(false)
+      const scopedStorage = getFinanceStorageInfo(userId)
+      const hasOwnedCache = scopedStorage.exists && scopedStorage.ownerId === userId
+      const localState = hasOwnedCache ? loadFinanceState(emptyState, userId) : emptyState
+      try {
+        if (hasOwnedCache && hasPendingFinanceSync(userId)) await importLocalFinanceState(userId, localState, true)
+        const remoteState = await fetchFinanceState(userId, hasOwnedCache ? localState.preferences : emptyState.preferences)
+        if (!active) return
+        const snapshot = JSON.stringify(remoteState)
+        lastSyncedSnapshot.current = snapshot
+        latestSnapshot.current = snapshot
+        setState(remoteState)
+        saveFinanceState(remoteState, userId)
+        clearPendingFinanceSync(userId)
+        setHydratedUserId(userId)
+      } catch (error) {
+        if (!active) return
+        const fallback = hasOwnedCache ? localState : emptyState
+        const fallbackSnapshot = JSON.stringify(fallback)
+        lastSyncedSnapshot.current = fallbackSnapshot
+        latestSnapshot.current = fallbackSnapshot
+        setState(fallback)
+        if (hasOwnedCache) {
+          setHydratedUserId(userId)
+          setSyncError('Supabase-თან დაკავშირება ვერ მოხერხდა. ნაჩვენებია მხოლოდ ამ ანგარიშის ლოკალურად შენახული მონაცემები.')
+        } else {
+          setDataLoadFailed(true)
+          setSyncError('Supabase-დან მონაცემების უსაფრთხოდ ჩატვირთვა ვერ მოხერხდა. სხვა ანგარიშის ან ცარიელი მონაცემები არ ჩატვირთულა.')
+        }
+        console.error('Unable to hydrate finance data', error)
+      }
+    }
+    void hydrate()
+    return () => { active = false }
+  }, [authChecking, userId])
+
+  useEffect(() => {
+    if (!userId || hydratedUserId !== userId) return
+    const snapshot = JSON.stringify(state)
+    latestSnapshot.current = snapshot
+    if (snapshot === lastSyncedSnapshot.current) return
+    saveFinanceState(state, userId)
+    markPendingFinanceSync(userId)
+    const timeout = window.setTimeout(() => {
+      syncQueue.current = syncQueue.current.catch(() => undefined).then(async () => {
+        try {
+          await replaceFinanceState(userId, state)
+          lastSyncedSnapshot.current = snapshot
+          if (latestSnapshot.current === snapshot) clearPendingFinanceSync(userId)
+          setSyncError('')
+        } catch (error) {
+          setSyncError('ცვლილებები შენახულია ამ მოწყობილობაზე, მაგრამ Supabase-თან სინქრონიზაცია ვერ მოხერხდა.')
+          console.error('Unable to sync finance data', error)
+        }
+      })
+    }, 500)
+    return () => window.clearTimeout(timeout)
+  }, [hydratedUserId, state, userId])
+
+  const importLegacyData = useCallback(async () => {
+    if (!userId || !legacyImportAvailable || getLegacyImportOwner()) return false
+    const legacyStorage = getFinanceStorageInfo()
+    if (!legacyStorage.exists || (legacyStorage.ownerId && legacyStorage.ownerId !== userId)) return false
+    try {
+      const legacyState = loadFinanceState(emptyState)
+      await importLocalFinanceState(userId, legacyState)
+      markLegacyFinanceImported(userId)
+      const remoteState = await fetchFinanceState(userId, state.preferences)
+      const snapshot = JSON.stringify(remoteState)
+      lastSyncedSnapshot.current = snapshot
+      latestSnapshot.current = snapshot
+      setState(remoteState)
+      saveFinanceState(remoteState, userId)
+      clearPendingFinanceSync(userId)
+      setLegacyImportAvailable(false)
+      setSyncError('')
+      return true
+    } catch (error) {
+      setSyncError('ძველი ლოკალური მონაცემების იმპორტი ვერ მოხერხდა. მონაცემები არ წაშლილა.')
+      console.error('Unable to import legacy finance data', error)
+      return false
+    }
+  }, [legacyImportAvailable, state.preferences, userId])
 
   const value = useMemo<FinanceContextValue>(() => {
     const update = (next: FinanceStateData) => setState(next)
@@ -80,6 +190,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     })
     return {
       ...state,
+      dataLoading,
+      dataLoadFailed,
+      syncError,
+      legacyImportAvailable,
+      importLegacyData,
       validTransactions,
       addTransaction: (input) => { const item: Transaction = { ...input, id: makeId('transaction'), createdAt: now(), updatedAt: now() }; update({ ...state, transactions: [item, ...state.transactions] }); return item },
       updateTransaction: (id, input) => update({ ...state, transactions: state.transactions.map((item) => item.id === id ? { ...input, id, createdAt: item.createdAt, updatedAt: now() } : item) }),
@@ -130,15 +245,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       setCurrency: (currency) => update({ ...state, preferences: { ...state.preferences, currency } }),
       markNotificationsRead: (ids) => update({ ...state, preferences: { ...state.preferences, readNotificationIds: Array.from(new Set([...state.preferences.readNotificationIds, ...ids])) } }),
       updatePreferences: (input) => update({ ...state, preferences: { ...state.preferences, ...input } }),
-      restoreFinanceData: (input) => { const restored = parseFinanceBackup(input, seedState); if (!restored) return false; setState(restored); return true },
+      restoreFinanceData: (input) => { const restored = parseFinanceBackup(input, emptyState); if (!restored) return false; setState(restored); return true },
       clearAllData: () => {
         const attachmentIds = state.transactions.flatMap((item) => item.attachments?.map((attachment) => attachment.id) ?? [])
         void deleteAttachmentBlobs(attachmentIds).catch((error) => console.error('Unable to clean up attachments', error))
         update({ transactions: [], accounts: [], budgets: [], familyMembers: [], debts: [], savingsGoals: [], shoppingItems: [], preferences: { ...state.preferences, readNotificationIds: [] } })
       },
-      resetDemoData: () => { clearFinanceState(); setState(seedState) },
     }
-  }, [state])
+  }, [dataLoadFailed, dataLoading, importLegacyData, legacyImportAvailable, state, syncError])
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>
 }

@@ -13,4 +13,11 @@ const authStorage = {
 }
 
 export const setRememberPersistence = (remember: boolean) => remember ? localStorage.setItem(persistenceKey, 'true') : localStorage.removeItem(persistenceKey)
-export const supabase = createClient(supabaseUrl, publishableKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: authStorage } })
+export const supabase = createClient(supabaseUrl, publishableKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: authStorage,
+  },
+})

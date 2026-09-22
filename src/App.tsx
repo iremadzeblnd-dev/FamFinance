@@ -23,7 +23,7 @@ import { deleteAttachmentBlobs, saveAttachmentBlobs } from './services/attachmen
 import { NotificationCenter } from './components/NotificationCenter'
 import { GlobalSearch } from './components/GlobalSearch'
 import { AuthProvider, useAuth } from './state/AuthContext'
-import { ForgotPasswordPage, LoginPage, RegisterPage } from './pages/AuthPages'
+import { AuthCallbackPage, CheckEmailPage, ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage } from './pages/AuthPages'
 
 function GlobalTransactionActions({ onOpenTransaction }: { onOpenTransaction: (type: TransactionType) => void }) {
   const { pathname } = useLocation()
@@ -42,7 +42,7 @@ function AppShell() {
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [toast, setToast] = useState('')
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>()
-  const { accounts, familyMembers, addTransaction, updateTransaction, preferences } = useFinance()
+  const { accounts, familyMembers, addTransaction, updateTransaction, preferences, syncError } = useFinance()
   const { logout } = useAuth()
   const activeFamilyMembers = familyMembers.filter((member) => !member.archived)
   const openModal = (type: TransactionType) => {
@@ -118,6 +118,7 @@ function AppShell() {
             </header>
 
             <main className="px-4 pb-6 pt-4 sm:px-6 sm:pt-6">
+              {syncError ? <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">{syncError}</p> : null}
               <GlobalTransactionActions onOpenTransaction={openModal} />
 
               <Routes>
@@ -156,17 +157,27 @@ function AppShell() {
 
 function ProtectedFinanceApp() {
   const { user, checking } = useAuth()
-  if (checking) return <div className="flex min-h-screen items-center justify-center bg-slate-100 text-sm text-slate-500">…</div>
+  const { dataLoading, dataLoadFailed, syncError } = useFinance()
+  if (checking || (user && dataLoading)) return <div className="flex min-h-screen items-center justify-center bg-slate-100 text-sm text-slate-500">მონაცემები იტვირთება…</div>
+  if (user && dataLoadFailed) return <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4"><div className="max-w-md rounded-2xl border border-amber-200 bg-white p-6 text-center shadow-sm"><p className="text-sm text-amber-800">{syncError}</p><button type="button" onClick={() => window.location.reload()} className="mt-4 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white">ხელახლა ცდა</button></div></div>
   return user ? <AppShell /> : <Navigate to="/login" replace />
 }
 
 function App() {
-  return <FinanceProvider><BrowserRouter><AuthProvider><Routes>
+  return <BrowserRouter><AuthProvider><FinanceApp /></AuthProvider></BrowserRouter>
+}
+
+function FinanceApp() {
+  const { user } = useAuth()
+  return <FinanceProvider key={user?.id ?? 'signed-out'}><Routes>
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
+    <Route path="/check-email" element={<CheckEmailPage />} />
     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+    <Route path="/reset-password" element={<ResetPasswordPage />} />
+    <Route path="/auth/callback" element={<AuthCallbackPage />} />
     <Route path="/*" element={<ProtectedFinanceApp />} />
-  </Routes></AuthProvider></BrowserRouter></FinanceProvider>
+  </Routes></FinanceProvider>
 }
 
 export default App

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --configLoader native",
     "lint": "oxlint",
     "test:ocr": "tsx --test tests/receiptOcr.test.ts",
     "test:attachments": "tsx --test tests/attachments.test.ts",

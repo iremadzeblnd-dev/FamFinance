@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="GISA - ელექტრო ტრანსპორტი და აქსესუარები საქართველოში">
+	<title>GISA | ელექტრო ტრანსპორტი</title>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Fira+GO:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+		:root { --ink:#18232a; --muted:#728087; --line:#e5ebe8; --lime:#d7f34b; --lime-dark:#b5d52d; --mint:#eef6ed; --orange:#ff7349; --white:#fff; --shadow:0 18px 50px rgba(22,43,36,.08); }
+		* { box-sizing:border-box; }
+		html { scroll-behavior:smooth; }
+		body { margin:0; color:var(--ink); background:#fbfcfa; font-family:'Fira GO',Arial,sans-serif; }
+		button, input, select { font:inherit; }
+		button { border:0; cursor:pointer; }
+		.topline { background:var(--ink); color:#e9f2e9; text-align:center; padding:9px 16px; font-size:12px; letter-spacing:.2px; }
+		header { background:var(--white); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:20; }
+		.nav { max-width:1180px; margin:auto; height:76px; display:flex; align-items:center; gap:28px; padding:0 20px; }
+		.brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:26px; letter-spacing:-1.5px; }
+		.brand-mark { width:38px; height:38px; display:grid; place-items:center; background:var(--lime); clip-path:polygon(0 0,100% 0,84% 100%,0 82%); font-size:17px; }
+		.links { display:flex; gap:25px; margin-left:24px; font-size:14px; color:#58676b; }
+		.links a { color:inherit; text-decoration:none; }
+		.links a:hover { color:var(--ink); }
+		.nav-actions { margin-left:auto; display:flex; gap:9px; align-items:center; }
+		.icon-btn { background:#f3f6f2; color:var(--ink); width:42px; height:42px; border-radius:50%; display:grid; place-items:center; position:relative; font-size:18px; }
+		.cart-count { position:absolute; right:-2px; top:-3px; background:var(--orange); color:white; border-radius:50%; min-width:18px; height:18px; font-size:10px; display:grid; place-items:center; font-weight:700; }
+		.hero { max-width:1180px; margin:0 auto; padding:34px 20px 26px; display:grid; grid-template-columns:1.03fr .97fr; gap:24px; }
+		.hero-copy { background:var(--lime); min-height:390px; padding:45px 46px; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; }
+		.hero-copy:after { content:'GISA'; position:absolute; right:-20px; bottom:-55px; font:800 150px 'Space Grotesk'; color:rgba(255,255,255,.25); letter-spacing:-12px; }
+		.eyebrow { text-transform:uppercase; letter-spacing:2px; font-size:11px; font-weight:700; margin-bottom:15px; }
+		h1 { font:700 clamp(38px,5vw,66px)/.98 'Space Grotesk',sans-serif; letter-spacing:-3px; margin:0 0 18px; max-width:540px; }
+		.hero-copy p { max-width:390px; color:#405047; line-height:1.65; margin:0 0 25px; font-size:14px; }
+		.primary { background:var(--ink); color:white; padding:14px 20px; font-weight:700; width:max-content; transition:.2s; }
+		.primary:hover { background:#324248; transform:translateY(-2px); }
+		.hero-visual { min-height:390px; overflow:hidden; position:relative; background:#cfdad2; }
+		.hero-visual img { width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.82); }
+		.hero-tag { position:absolute; left:20px; bottom:20px; background:white; padding:13px 16px; font-size:13px; font-weight:700; }
+		.hero-tag span { display:block; color:var(--muted); font-size:11px; font-weight:400; margin-top:3px; }
+		.section { max-width:1180px; margin:auto; padding:38px 20px 64px; }
+		.section-head { display:flex; justify-content:space-between; align-items:end; gap:16px; margin-bottom:22px; }
+		h2 { font:700 30px 'Space Grotesk'; letter-spacing:-1.3px; margin:0; }
+		.section-head p { color:var(--muted); font-size:13px; margin:4px 0 0; }
+		.categories { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:45px; }
+		.category { position:relative; height:150px; overflow:hidden; background:#dfe9e2; text-align:left; padding:16px; color:white; }
+		.category:after { content:''; position:absolute; inset:0; background:linear-gradient(0deg,rgba(10,21,22,.72),transparent 75%); }
+		.category img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:.4s; }
+		.category:hover img { transform:scale(1.06); }
+		.category strong { position:absolute; z-index:1; bottom:15px; left:16px; font-size:14px; }
+		.filter-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+		.filter { background:white; border:1px solid var(--line); padding:9px 15px; color:#5a686b; font-size:12px; }
+		.filter.active, .filter:hover { background:var(--ink); color:white; border-color:var(--ink); }
+		.products { display:grid; grid-template-columns:repeat(4,1fr); gap:15px; }
+		.product { background:white; border:1px solid var(--line); min-width:0; transition:.22s; }
+		.product:hover { box-shadow:var(--shadow); transform:translateY(-4px); }
+		.product-img { position:relative; height:220px; background:#eef3ee; overflow:hidden; }
+		.product-img img { width:100%; height:100%; object-fit:cover; transition:.35s; }
+		.product:hover .product-img img { transform:scale(1.04); }
+		.badge { position:absolute; left:12px; top:12px; background:var(--lime); padding:6px 8px; font-size:10px; font-weight:700; }
+		.heart { position:absolute; right:12px; top:12px; width:30px; height:30px; background:#fff; border-radius:50%; color:#536163; }
+		.product-body { padding:15px; }
+		.product-type { color:var(--muted); font-size:11px; margin-bottom:6px; }
+		.product h3 { font-size:15px; margin:0 0 12px; font-weight:700; line-height:1.35; min-height:40px; }
+		.product-meta { display:flex; gap:8px; color:#82908b; font-size:11px; padding-bottom:13px; border-bottom:1px solid var(--line); }
+		.buy-row { display:flex; justify-content:space-between; align-items:center; padding-top:13px; gap:6px; }
+		.price { font:700 17px 'Space Grotesk'; white-space:nowrap; }
+		.price small { font:400 11px 'Fira GO'; color:var(--muted); }
+		.add { background:var(--ink); color:white; width:34px; height:34px; font-size:21px; line-height:1; }
+		.trust { background:var(--mint); padding:24px 20px; }
+		.trust-inner { max-width:1180px; margin:auto; display:grid; grid-template-columns:repeat(3,1fr); gap:25px; }
+		.trust-item { display:flex; gap:12px; align-items:center; font-size:13px; }
+		.trust-icon { width:40px; height:40px; background:white; display:grid; place-items:center; font-size:18px; }
+		.trust-item span { display:block; color:var(--muted); font-size:11px; margin-top:3px; }
+		footer { background:var(--ink); color:#e7eee8; padding:42px 20px 25px; }
+		.footer-inner { max-width:1180px; margin:auto; display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:40px; }
+		footer .brand { color:white; margin-bottom:13px; } footer p { color:#9eaeaa; font-size:12px; line-height:1.7; max-width:270px; }
+		footer h4 { margin:0 0 14px; font-size:13px; } footer a { color:#aabbb5; display:block; text-decoration:none; font-size:12px; margin-bottom:9px; }
+		.copyright { max-width:1180px; border-top:1px solid #344348; margin:28px auto 0; padding-top:18px; color:#81918d; font-size:11px; }
+		.overlay { position:fixed; inset:0; background:rgba(12,23,24,.46); z-index:40; display:none; }
+		.overlay.open { display:block; }
+		.drawer { position:absolute; right:0; top:0; height:100%; width:min(440px,100%); background:#fbfcfa; padding:27px; display:flex; flex-direction:column; }
+		.drawer-head { display:flex; justify-content:space-between; align-items:center; padding-bottom:20px; border-bottom:1px solid var(--line); }
+		.drawer h2 { font-size:25px; } .close { background:none; color:var(--ink); font-size:25px; }
+		.cart-items { flex:1; overflow:auto; padding:18px 0; }
+		.cart-item { display:grid; grid-template-columns:68px 1fr auto; gap:12px; align-items:center; margin-bottom:17px; }
+		.cart-item img { width:68px; height:68px; object-fit:cover; } .cart-item strong { font-size:13px; display:block; margin-bottom:5px; }
+		.cart-item small { color:var(--muted); font-size:11px; } .cart-remove { background:none; color:var(--orange); font-size:11px; }
+		.drawer-foot { border-top:1px solid var(--line); padding-top:17px; } .total { display:flex; justify-content:space-between; margin-bottom:15px; font-weight:700; }
+		.full { width:100%; text-align:center; }
+		.modal-box { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(570px,calc(100% - 30px)); max-height:90vh; overflow:auto; background:#fbfcfa; padding:27px; }
+		.modal-top { display:flex; justify-content:space-between; align-items:start; margin-bottom:20px; } .modal-top h2 { max-width:420px; font-size:24px; }
+		.details { display:grid; grid-template-columns:1fr 1fr; gap:22px; } .detail-img { width:100%; height:240px; object-fit:cover; background:#edf3ee; }
+		.detail-copy p { color:#61716d; font-size:13px; line-height:1.7; margin:0 0 17px; } .specs { border-top:1px solid var(--line); padding-top:12px; }
+		.spec { display:flex; justify-content:space-between; font-size:11px; padding:6px 0; color:#6d7d78; } .spec b { color:var(--ink); }
+		.checkout-form { display:grid; gap:12px; } .checkout-form label { font-size:11px; color:#62716d; } .checkout-form input, .checkout-form select { width:100%; border:1px solid var(--line); background:white; padding:12px; margin-top:5px; outline:0; }
+		.pay-options { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:6px; } .pay-option { border:1px solid var(--line); background:white; padding:11px 6px; font-size:11px; text-align:center; }
+		.pay-option.active { border:2px solid var(--ink); padding:10px 5px; background:#f3f9db; }
+		.installment { background:var(--mint); padding:12px; font-size:12px; margin:3px 0; } .installment b { display:block; font-size:17px; margin-top:3px; }
+		.empty { text-align:center; padding:50px 0; color:var(--muted); font-size:13px; }
+		@media (max-width:800px) { .nav { height:64px; padding:0 15px; } .links { display:none; } .hero { grid-template-columns:1fr; padding:15px 15px 10px; } .hero-copy { min-height:360px; padding:32px 27px; } .hero-visual { min-height:280px; } .section { padding:30px 15px 45px; } .categories { grid-template-columns:repeat(2,1fr); margin-bottom:32px; } .category { height:125px; } .category:last-child { grid-column:span 2; } .products { grid-template-columns:repeat(2,1fr); gap:10px; } .product-img { height:160px; } .product-body { padding:12px; } .product h3 { font-size:13px; } .product-meta { display:none; } .price { font-size:15px; } .section-head { align-items:start; } h2 { font-size:25px; } .trust-inner { grid-template-columns:1fr; gap:14px; } .footer-inner { grid-template-columns:1fr 1fr; gap:25px; } .footer-inner > div:first-child { grid-column:span 2; } }
+		@media (max-width:400px) { .product-img { height:140px; } .hero-copy { min-height:330px; } .hero-copy:after { font-size:100px; } }
+	</style>
+</head>
+<body>
+	<div class="topline">უფასო მიწოდება თბილისში 300₾-ზე მეტი შეკვეთისას · განვადება 0%-დან</div>
+	<header><nav class="nav"><a href="#top" class="brand"><span class="brand-mark">G</span>GISA</a><div class="links"><a href="#shop">მაღაზია</a><a href="#categories">კატეგორიები</a><a href="#about">რატომ GISA?</a><a href="#contact">კონტაქტი</a></div><div class="nav-actions"><button class="icon-btn" aria-label="ძიება" onclick="focusSearch()">⌕</button><button class="icon-btn" aria-label="კალათა" onclick="openCart()">🛒<span class="cart-count" id="cartCount">0</span></button></div></nav></header>
+	<main id="top">
+		<section class="hero"><div class="hero-copy"><div class="eyebrow">MOVE YOUR WAY · 2026</div><h1>შენი ქალაქი.<br>შენი ტემპი.</h1><p>ელექტრო ტრანსპორტი ყოველდღიური გადაადგილებისთვის. შერჩეული მოდელები, რეალური გარანტია და სერვისი ერთ სივრცეში.</p><button class="primary" onclick="document.getElementById('shop').scrollIntoView()">შეარჩიე შენი ტრანსპორტი →</button></div><div class="hero-visual"><img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=1000&q=85" alt="ელექტრო ველოსიპედი ქალაქში"><div class="hero-tag">ელექტრო თავისუფლება<span>ახალი კოლექცია 2026</span></div></div></section>
+		<section class="section" id="categories"><div class="section-head"><div><h2>რას ეძებ?</h2><p>აირჩიე შენი გადაადგილების სტილი</p></div></div><div class="categories"><button class="category" onclick="setFilter('ელექტრო სკუტერები')"><img src="https://images.unsplash.com/photo-1604868189265-219ba7e3f7f4?auto=format&fit=crop&w=600&q=80" alt="ელექტრო სკუტერები"><strong>ელექტრო სკუტერები</strong></button><button class="category" onclick="setFilter('ელექტრო ველოები')"><img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=600&q=80" alt="ელექტრო ველოსიპედები"><strong>ელექტრო ველოები</strong></button><button class="category" onclick="setFilter('კვადროციკლები')"><img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=600&q=80" alt="კვადროციკლები"><strong>კვადროციკლები</strong></button><button class="category" onclick="setFilter('ჩაფხუტები')"><img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=600&q=80" alt="ჩაფხუტები"><strong>ჩაფხუტები</strong></button><button class="category" onclick="setFilter('აქსესუარები')"><img src="https://images.unsplash.com/photo-1558980664-10ea0a568e7e?auto=format&fit=crop&w=600&q=80" alt="აქსესუარები"><strong>აქსესუარები</strong></button></div></section>
+		<section class="section" id="shop"><div class="section-head"><div><h2>რჩეული პროდუქტები</h2><p id="resultText">ყველა პროდუქტი · გარანტიით და სერვისით</p></div><input id="search" type="search" placeholder="მოძებნე პროდუქტი..." oninput="renderProducts()" style="border:1px solid var(--line);padding:11px 13px;background:white;width:190px;font-size:12px"></div><div class="filter-row"><button class="filter active" onclick="setFilter('ყველა',this)">ყველა</button><button class="filter" onclick="setFilter('ელექტრო სკუტერები',this)">ელექტრო სკუტერები</button><button class="filter" onclick="setFilter('ელექტრო ველოები',this)">ელექტრო ველოები</button><button class="filter" onclick="setFilter('კვადროციკლები',this)">კვადროციკლები</button><button class="filter" onclick="setFilter('ჩაფხუტები',this)">ჩაფხუტები</button><button class="filter" onclick="setFilter('აქსესუარები',this)">აქსესუარები</button></div><div class="products" id="products"></div></section>
+	</main>
+	<div class="trust" id="about"><div class="trust-inner"><div class="trust-item"><div class="trust-icon">✓</div><div><b>12 თვე გარანტია</b><span>ყველა ტრანსპორტზე</span></div></div><div class="trust-item"><div class="trust-icon">↗</div><div><b>სწრაფი მიწოდება</b><span>თბილისში 1-2 სამუშაო დღე</span></div></div><div class="trust-item"><div class="trust-icon">♢</div><div><b>სანდო გადახდა</b><span>BOG · TBC · Credo · განვადება</span></div></div></div></div>
+	<footer id="contact"><div class="footer-inner"><div><a href="#top" class="brand"><span class="brand-mark">G</span>GISA</a><p>ელექტრო მოძრაობის ახალი სტანდარტი საქართველოში. აირჩიე უკეთესი გზა ყოველდღე.</p></div><div><h4>ინფორმაცია</h4><a href="#shop">პროდუქტები</a><a href="#about">მიწოდება და გარანტია</a><a href="#contact">განვადება</a></div><div><h4>დაგვიკავშირდი</h4><a href="tel:557380340">557 380 340</a><a href="mailto:iremadzeblnd@gmail.com">iremadzeblnd@gmail.com</a><a>გიორგი ირემაძე</a></div></div><div class="copyright">© 2026 GISA · ყველა უფლება დაცულია</div></footer>
+	<div class="overlay" id="cartOverlay" onclick="if(event.target===this)closeCart()"><aside class="drawer"><div class="drawer-head"><h2>შენი კალათა</h2><button class="close" onclick="closeCart()">×</button></div><div class="cart-items" id="cartItems"></div><div class="drawer-foot"><div class="total"><span>ჯამი</span><span id="cartTotal">0 ₾</span></div><button class="primary full" onclick="openCheckout()">შეკვეთის გაგრძელება →</button></div></aside></div>
+	<div class="overlay" id="productOverlay" onclick="if(event.target===this)closeProduct()"><div class="modal-box"><div class="modal-top"><h2 id="detailTitle"></h2><button class="close" onclick="closeProduct()">×</button></div><div class="details"><img class="detail-img" id="detailImg" alt=""><div class="detail-copy"><p id="detailDesc"></p><div class="specs" id="detailSpecs"></div><div class="buy-row"><span class="price" id="detailPrice"></span><button class="primary" id="detailAdd">დამატება</button></div></div></div></div></div>
+	<div class="overlay" id="checkoutOverlay" onclick="if(event.target===this)closeCheckout()"><div class="modal-box checkout"><div class="modal-top"><h2>შეკვეთის გაფორმება</h2><button class="close" onclick="closeCheckout()">×</button></div><form class="checkout-form" onsubmit="submitOrder(event)"><label>სახელი და გვარი<input required placeholder="მაგ. გიორგი ირემაძე"></label><label>ტელეფონის ნომერი<input required type="tel" placeholder="557 380 340"></label><label>მისამართი<input required placeholder="ქალაქი, ქუჩა, ნომერი"></label><label>გადახდის მეთოდი<div class="pay-options"><button type="button" class="pay-option active" onclick="selectPay(this)">BOG<br>საქართველოს ბანკი</button><button type="button" class="pay-option" onclick="selectPay(this)">TBC<br>თიბისი ბანკი</button><button type="button" class="pay-option" onclick="selectPay(this)">Credo<br>კრედო ბანკი</button></div></label><label>განვადების ვადა<select><option>ერთიანი გადახდა</option><option>3 თვე · 0%</option><option>6 თვე · 0%</option><option>12 თვე · პირობების მიხედვით</option></select></label><div class="installment">შეკვეთის ჯამი <b id="checkoutTotal">0 ₾</b></div><button class="primary full" type="submit">შეკვეთის დადასტურება →</button></form></div></div>
+	<script>
+		const products = [
+			{id:1,cat:'ელექტრო სკუტერები',name:'Segway Ninebot MAX G2',type:'პრემიუმ სკუტერი',price:2490,img:'https://images.unsplash.com/photo-1604868189265-219ba7e3f7f4?auto=format&fit=crop&w=700&q=82',desc:'კომფორტული და სწრაფი სკუტერი ქალაქის ყოველდღიური გადაადგილებისთვის. ორმაგი დაკიდება მშვიდი მგზავრობისთვის.',specs:['სვლის მარაგი','70 კმ'],extra:'25 კმ/სთ'},
+			{id:2,cat:'ელექტრო ველოები',name:'GISA Urban E-Bike',type:'ქალაქის ელექტრო ველო',price:3290,img:'https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=700&q=82',desc:'მინიმალისტური ქალაქის ველო ძლიერი ძრავით, მოხსნადი ელემენტით და კომფორტული, სწორი პოზიციით.',specs:['სვლის მარაგი','80 კმ'],extra:'250W ძრავა'},
+			{id:3,cat:'კვადროციკლები',name:'Volt Ranger X4',type:'ელექტრო კვადროციკლი',price:5890,img:'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=700&q=82',desc:'გამძლე ოთხბორბლიანი ტრანსპორტი აგარაკისთვის, სათავგადასავლო გასეირნებისა და რთული გზებისთვის.',specs:['სვლის მარაგი','90 კმ'],extra:'1000W ძრავა'},
+			{id:4,cat:'ჩაფხუტები',name:'Urban Shield MIPS',type:'უსაფრთხოების ჩაფხუტი',price:189,img:'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=700&q=82',desc:'მსუბუქი, ვენტილირებადი ჩაფხუტი MIPS დაცვის სისტემით. რეგულირებადი ზომა და ქალაქის სტილი.',specs:['ზომა','M / L'],extra:'MIPS დაცვა'},
+			{id:5,cat:'აქსესუარები',name:'GISA Fast Charger',type:'სწრაფი დამტენი',price:249,img:'https://images.unsplash.com/photo-1502744688674-c619d1586c9e?auto=format&fit=crop&w=700&q=82',desc:'კომპაქტური სწრაფი დამტენი ელექტრო სკუტერებისა და ველოებისთვის. უსაფრთხო დატენვა სახლში ან ოფისში.',specs:['დატენვის დრო','3 სთ'],extra:'უნივერსალური'},
+			{id:6,cat:'ელექტრო სკუტერები',name:'Xiaomi Scooter 4 Pro',type:'ყოველდღიური სკუტერი',price:1890,img:'https://images.unsplash.com/photo-1592919505780-303950717480?auto=format&fit=crop&w=700&q=82',desc:'სანდო ყოველდღიური სკუტერი ძლიერი ალუმინის ჩარჩოთი, ფართო საბურავებით და მარტივი მართვით.',specs:['სვლის მარაგი','55 კმ'],extra:'25 კმ/სთ'},
+			{id:7,cat:'აქსესუარები',name:'Smart Lock Pro',type:'ჭკვიანი საკეტი',price:129,img:'https://images.unsplash.com/photo-1502744688674-c619d1586c9e?auto=format&fit=crop&w=700&q=82',desc:'მტკიცე საკეტი ციფრული კოდით. დაიცავი შენი ტრანსპორტი ქალაქში გაჩერებისას.',specs:['მასალა','ფოლადი'],extra:'IPX5'},
+			{id:8,cat:'ელექტრო ველოები',name:'Trail E-Bike 500',type:'მთის ელექტრო ველო',price:4190,img:'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=700&q=82',desc:'მთის ბილიკებისთვის შექმნილი ელექტრო ველო, ჰიდრავლიკური მუხრუჭებითა და დიდი ელემენტით.',specs:['სვლის მარაგი','100 კმ'],extra:'500W ძრავა'}
+		];
+		let filter='ყველა', cart=[];
+		function setFilter(value, button) { filter=value; document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active')); if(button) button.classList.add('active'); else document.querySelectorAll('.filter').forEach(x=>{if(x.textContent===value)x.classList.add('active')}); renderProducts(); document.getElementById('shop').scrollIntoView({behavior:'smooth'}); }
+		function renderProducts() { const q=(document.getElementById('search').value||'').toLowerCase(); const shown=products.filter(p=>(filter==='ყველა'||p.cat===filter)&&(p.name+p.cat).toLowerCase().includes(q)); document.getElementById('resultText').textContent=`${shown.length} პროდუქტი · გარანტიით და სერვისით`; document.getElementById('products').innerHTML=shown.length?shown.map((p,i)=>`<article class="product"><div class="product-img"><img src="${p.img}" alt="${p.name}" loading="lazy"><span class="badge">${i<2?'რჩეული':'GISA'}</span><button class="heart" aria-label="რჩეულებში დამატება">♡</button></div><div class="product-body"><div class="product-type">${p.type}</div><h3>${p.name}</h3><div class="product-meta"><span>✓ ${p.specs[1]}</span><span>✓ ${p.extra}</span></div><div class="buy-row"><span class="price">${p.price.toLocaleString('ka-GE')} <small>₾</small></span><button class="add" aria-label="კალათაში დამატება" onclick="addToCart(${p.id})">+</button></div><button onclick="openProduct(${p.id})" style="background:none;color:var(--muted);font-size:11px;padding:10px 0 0">დეტალურად ნახვა →</button></div></article>`).join(''):'<div class="empty">ამ ძიებისთვის პროდუქტი ვერ მოიძებნა.</div>'; }
+		function addToCart(id) { const p=products.find(x=>x.id===id); cart.push(p); updateCart(); showToast('პროდუქტი დაემატა კალათაში'); }
+		function updateCart() { document.getElementById('cartCount').textContent=cart.length; document.getElementById('cartTotal').textContent=cart.reduce((a,p)=>a+p.price,0).toLocaleString('ka-GE')+' ₾'; document.getElementById('checkoutTotal').textContent=cart.reduce((a,p)=>a+p.price,0).toLocaleString('ka-GE')+' ₾'; document.getElementById('cartItems').innerHTML=cart.length?cart.map((p,i)=>`<div class="cart-item"><img src="${p.img}" alt=""><div><strong>${p.name}</strong><small>${p.price.toLocaleString('ka-GE')} ₾</small></div><button class="cart-remove" onclick="removeCart(${i})">წაშლა</button></div>`).join(''):'<div class="empty">კალათა ცარიელია.<br>დროა შენი შემდეგი მარშრუტი აირჩიო.</div>'; }
+		function removeCart(i){cart.splice(i,1);updateCart();} function openCart(){document.getElementById('cartOverlay').classList.add('open');updateCart()} function closeCart(){document.getElementById('cartOverlay').classList.remove('open')}
+		function openProduct(id){const p=products.find(x=>x.id===id);document.getElementById('detailTitle').textContent=p.name;document.getElementById('detailImg').src=p.img;document.getElementById('detailDesc').textContent=p.desc;document.getElementById('detailPrice').innerHTML=p.price.toLocaleString('ka-GE')+' <small>₾</small>';document.getElementById('detailSpecs').innerHTML=p.specs.map(x=>`<div class="spec"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')+`<div class="spec"><span>მახასიათებელი</span><b>${p.extra}</b></div>`;document.getElementById('detailAdd').onclick=()=>{addToCart(id);closeProduct()};document.getElementById('productOverlay').classList.add('open')}
+		function closeProduct(){document.getElementById('productOverlay').classList.remove('open')} function openCheckout(){if(!cart.length){showToast('ჯერ დაამატე პროდუქტი კალათაში');return}closeCart();document.getElementById('checkoutOverlay').classList.add('open')} function closeCheckout(){document.getElementById('checkoutOverlay').classList.remove('open')} function selectPay(btn){document.querySelectorAll('.pay-option').forEach(x=>x.classList.remove('active'));btn.classList.add('active')} function submitOrder(e){e.preventDefault();closeCheckout();cart=[];updateCart();showToast('მადლობა! მალე დაგიკავშირდებით შეკვეთის დასადასტურებლად.')} function focusSearch(){document.getElementById('search').focus();document.getElementById('shop').scrollIntoView({behavior:'smooth'})}
+		function showToast(text){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style='position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#18232a;color:white;padding:13px 18px;font-size:12px;z-index:100;box-shadow:0 8px 24px #0002';document.body.appendChild(t)}t.textContent=text;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',2600)}
+		renderProducts(); updateCart();
+	</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
