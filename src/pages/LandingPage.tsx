@@ -10,7 +10,7 @@ const landingText = {
     navBenefits: 'შესაძლებლობები', navHow: 'როგორ მუშაობს', navAbout: 'ჩვენ შესახებ', login: 'შესვლა', register: 'რეგისტრაცია', eyebrow: 'ოჯახის ფინანსები ერთ სივრცეში',
     title: 'მართეთ ოჯახის ფინანსები მარტივად და ერთად',
     description: 'FamFinance გაძლევთ სრულ სურათს შემოსავლებზე, ხარჯებზე, ბიუჯეტებზე და საერთო ფინანსურ მიზნებზე — უსაფრთხოდ, გასაგებად და მთელი ოჯახისთვის.',
-    primaryCta: 'დაიწყე უფასოდ', secondaryCta: 'შესვლა', previewTitle: 'თქვენი ფინანსური სივრცე', previewText: 'ყველა მნიშვნელოვანი მონაცემი ერთ ორგანიზებულ დაფაზე.',
+    primaryCta: 'დაიწყე უფასოდ', secondaryCta: 'შესვლა', previewTitle: 'თქვენი ფინანსური სივრცე', previewText: 'ყველა მნიშვნელოვანი მონაცემი ერთ ორგანიზებულ დაფაზე.', previewDemo: 'დემო მონაცემები', previewIncome: 'შემოსავალი', previewExpense: 'ხარჯი', previewSavings: 'დანაზოგი', previewProgress: 'თვიური განაწილება',
     benefitsEyebrow: 'ყველაფერი, რაც გჭირდებათ', benefitsTitle: 'ოჯახის ფინანსების სრული მართვა', benefitsDescription: 'აკონტროლეთ ყოველდღიური მოძრაობა, დაგეგმეთ მომავალი და დარჩით კავშირზე ოჯახის წევრებთან.',
     benefits: [
       ['შემოსავლები და ხარჯები', 'ჩაწერეთ და მოძებნეთ ყველა ფინანსური მოძრაობა ერთ სივრცეში.'],
@@ -30,7 +30,7 @@ const landingText = {
     navBenefits: 'Features', navHow: 'How it works', navAbout: 'About us', login: 'Sign in', register: 'Register', eyebrow: 'Family finances in one place',
     title: 'Manage your family finances simply, together',
     description: 'FamFinance gives you a complete view of income, expenses, budgets, and shared financial goals—securely, clearly, and for the whole family.',
-    primaryCta: 'Get started free', secondaryCta: 'Sign in', previewTitle: 'Your financial workspace', previewText: 'Every important detail on one organized dashboard.',
+    primaryCta: 'Get started free', secondaryCta: 'Sign in', previewTitle: 'Your financial workspace', previewText: 'Every important detail on one organized dashboard.', previewDemo: 'Demo data', previewIncome: 'Income', previewExpense: 'Expenses', previewSavings: 'Savings', previewProgress: 'Monthly allocation',
     benefitsEyebrow: 'Everything you need', benefitsTitle: 'Complete family finance management', benefitsDescription: 'Track daily activity, plan ahead, and stay connected with your family.',
     benefits: [
       ['Income and expenses', 'Record and find every financial movement in one place.'],
@@ -50,7 +50,7 @@ const landingText = {
     navBenefits: 'Возможности', navHow: 'Как это работает', navAbout: 'О нас', login: 'Войти', register: 'Регистрация', eyebrow: 'Семейные финансы в одном месте',
     title: 'Управляйте семейными финансами просто и вместе',
     description: 'FamFinance показывает полную картину доходов, расходов, бюджетов и общих финансовых целей — безопасно, понятно и для всей семьи.',
-    primaryCta: 'Начать бесплатно', secondaryCta: 'Войти', previewTitle: 'Ваше финансовое пространство', previewText: 'Все важные данные на одной организованной панели.',
+    primaryCta: 'Начать бесплатно', secondaryCta: 'Войти', previewTitle: 'Ваше финансовое пространство', previewText: 'Все важные данные на одной организованной панели.', previewDemo: 'Демо-данные', previewIncome: 'Доход', previewExpense: 'Расходы', previewSavings: 'Сбережения', previewProgress: 'Распределение за месяц',
     benefitsEyebrow: 'Всё необходимое', benefitsTitle: 'Полное управление семейными финансами', benefitsDescription: 'Контролируйте ежедневные операции, планируйте будущее и оставайтесь на связи с семьёй.',
     benefits: [
       ['Доходы и расходы', 'Записывайте и находите все финансовые операции в одном месте.'],
@@ -70,7 +70,7 @@ const landingText = {
     navBenefits: 'Özellikler', navHow: 'Nasıl çalışır', navAbout: 'Hakkımızda', login: 'Giriş yap', register: 'Kayıt ol', eyebrow: 'Aile finansı tek bir yerde',
     title: 'Aile finansınızı kolayca ve birlikte yönetin',
     description: 'FamFinance; gelir, gider, bütçe ve ortak finansal hedeflerinizi güvenli, anlaşılır ve tüm aileye uygun şekilde tek yerde gösterir.',
-    primaryCta: 'Ücretsiz başlayın', secondaryCta: 'Giriş yap', previewTitle: 'Finans çalışma alanınız', previewText: 'Tüm önemli bilgiler düzenli tek bir panelde.',
+    primaryCta: 'Ücretsiz başlayın', secondaryCta: 'Giriş yap', previewTitle: 'Finans çalışma alanınız', previewText: 'Tüm önemli bilgiler düzenli tek bir panelde.', previewDemo: 'Demo verileri', previewIncome: 'Gelir', previewExpense: 'Gider', previewSavings: 'Birikim', previewProgress: 'Aylık dağılım',
     benefitsEyebrow: 'İhtiyacınız olan her şey', benefitsTitle: 'Eksiksiz aile finansı yönetimi', benefitsDescription: 'Günlük hareketleri takip edin, geleceği planlayın ve ailenizle bağlantıda kalın.',
     benefits: [
       ['Gelir ve giderler', 'Tüm finansal hareketleri tek yerde kaydedin ve bulun.'],
@@ -116,11 +116,18 @@ export function LandingPage() {
                 <div><p className="font-bold text-slate-900">FamFinance</p><p className="mt-1 text-xs text-slate-500">{copy.previewTitle}</p></div>
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><BarChart3 className="h-5 w-5" /></span>
               </div>
-              <p className="mt-5 text-sm leading-6 text-slate-500">{copy.previewText}</p>
-              <div className="mt-5 grid grid-cols-2 gap-3"><PreviewCard icon={ReceiptText} /><PreviewCard icon={WalletCards} /><PreviewCard icon={Target} /><PreviewCard icon={MessageCircle} /></div>
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-2"><p className="text-sm leading-6 text-slate-500">{copy.previewText}</p><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">{copy.previewDemo}</span></div>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <DemoMetric label={copy.previewIncome} value="2,500 ₾" tone="emerald" />
+                <DemoMetric label={copy.previewExpense} value="1,200 ₾" tone="rose" />
+                <DemoMetric label={copy.previewSavings} value="1,300 ₾" tone="blue" />
+              </div>
               <div className="mt-4 rounded-2xl bg-slate-50 p-4">
-                <div className="flex items-center justify-between"><span className="h-3 w-24 rounded-full bg-slate-200" /><span className="h-3 w-12 rounded-full bg-emerald-200" /></div>
-                <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200"><div className="h-full w-2/3 rounded-full bg-emerald-500" /></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-xs font-semibold text-slate-600">{copy.previewProgress}</span><span className="text-xs font-bold text-emerald-700">52%</span></div>
+                <div className="mt-4 flex h-20 items-end justify-between gap-2" aria-hidden="true">
+                  {[38, 56, 44, 72, 60, 84, 68].map((height, index) => <span key={index} className="w-full rounded-t-md bg-emerald-500/80" style={{ height: `${height}%` }} />)}
+                </div>
+                <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-slate-200"><span className="h-full w-[48%] bg-rose-400" /><span className="h-full w-[52%] bg-emerald-500" /></div>
               </div>
             </div>
           </div>
@@ -142,6 +149,7 @@ export function LandingPage() {
   </div>
 }
 
-function PreviewCard({ icon: Icon }: { icon: LucideIcon }) {
-  return <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><Icon className="h-5 w-5 text-emerald-600" /><span className="mt-4 block h-2.5 w-3/4 rounded-full bg-slate-200" /><span className="mt-2 block h-2 w-1/2 rounded-full bg-slate-200" /></div>
+function DemoMetric({ label, value, tone }: { label: string; value: string; tone: 'emerald' | 'rose' | 'blue' }) {
+  const toneClass = tone === 'emerald' ? 'bg-emerald-50 text-emerald-700' : tone === 'rose' ? 'bg-rose-50 text-rose-700' : 'bg-blue-50 text-blue-700'
+  return <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><span className="text-xs font-medium text-slate-500">{label}</span><strong className={`mt-2 block rounded-lg px-2 py-1.5 text-base font-black sm:text-sm lg:text-base ${toneClass}`}>{value}</strong></div>
 }
