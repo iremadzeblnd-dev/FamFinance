@@ -18,9 +18,7 @@ export function Sidebar() {
     <aside className="hidden w-72 shrink-0 border-r border-slate-200 bg-slate-50/80 p-5 lg:flex lg:flex-col lg:justify-between">
       <div>
         <div className="mb-8 flex items-center gap-3 px-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-            <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
-          </div>
+          <img src="/famfinance-logo.png" alt="FamFinance" className="h-10 w-10 shrink-0 object-contain" />
           <div>
             <p className="text-lg font-bold text-slate-900">ჩვენი ფინანსები</p>
           </div>
