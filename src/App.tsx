@@ -25,6 +25,7 @@ import { GlobalSearch } from './components/GlobalSearch'
 import { AuthProvider, useAuth } from './state/AuthContext'
 import { AuthCallbackPage, CheckEmailPage, ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage } from './pages/AuthPages'
 import { FamilyChat } from './components/FamilyChat'
+import { LandingPage } from './pages/LandingPage'
 
 function GlobalTransactionActions({ onOpenTransaction }: { onOpenTransaction: (type: TransactionType) => void }) {
   const { pathname } = useLocation()
@@ -169,9 +170,16 @@ function App() {
   return <BrowserRouter><AuthProvider><FinanceApp /></AuthProvider></BrowserRouter>
 }
 
+function HomeRoute() {
+  const { user, checking } = useAuth()
+  if (checking) return <div className="flex min-h-screen items-center justify-center bg-slate-100 text-sm text-slate-500">მიმდინარეობს ავტორიზაციის შემოწმება…</div>
+  return user ? <ProtectedFinanceApp /> : <LandingPage />
+}
+
 function FinanceApp() {
   const { user } = useAuth()
   return <FinanceProvider key={user?.id ?? 'signed-out'}><Routes>
+    <Route path="/" element={<HomeRoute />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
     <Route path="/check-email" element={<CheckEmailPage />} />
