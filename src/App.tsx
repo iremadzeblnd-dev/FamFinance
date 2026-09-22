@@ -24,6 +24,7 @@ import { NotificationCenter } from './components/NotificationCenter'
 import { GlobalSearch } from './components/GlobalSearch'
 import { AuthProvider, useAuth } from './state/AuthContext'
 import { AuthCallbackPage, CheckEmailPage, ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage } from './pages/AuthPages'
+import { FamilyChat } from './components/FamilyChat'
 
 function GlobalTransactionActions({ onOpenTransaction }: { onOpenTransaction: (type: TransactionType) => void }) {
   const { pathname } = useLocation()
@@ -140,6 +141,7 @@ function AppShell() {
 
       <MobileBottomNav onOpenMore={() => setMobileSheetOpen(true)} />
       <MobileSheet isOpen={mobileSheetOpen} onClose={() => setMobileSheetOpen(false)} />
+      <FamilyChat />
 
       <TransactionModal
         isOpen={isModalOpen}
