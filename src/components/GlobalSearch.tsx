@@ -27,7 +27,7 @@ export function GlobalSearch({ onOpenTransaction }: { onOpenTransaction: (transa
   const containerRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const t = (key: string) => translate(preferences.language, key)
-  const money = (value: number) => formatCurrency(value, preferences.currency, localeMap[preferences.language])
+  const money = (value: number) => formatCurrency(value, localeMap[preferences.language])
 
   const source = useMemo<SearchResult[]>(() => {
     const results: SearchResult[] = []
@@ -64,7 +64,7 @@ export function GlobalSearch({ onOpenTransaction }: { onOpenTransaction: (transa
     const categories = new Set([...preferences.incomeCategories, ...preferences.expenseCategories, ...validTransactions.map((item) => item.category), ...budgets.map((item) => item.category), ...shoppingItems.map((item) => item.category)])
     categories.forEach((category) => results.push({ id: `category-${category}`, type: 'კატეგორია', name: category, route: '/settings', searchable: [category, 'კატეგორია', 'category'] }))
     return results
-  }, [accounts, budgets, debts, familyMembers, preferences.currency, preferences.expenseCategories, preferences.incomeCategories, preferences.language, savingsGoals, shoppingItems, validTransactions])
+  }, [accounts, budgets, debts, familyMembers, preferences.expenseCategories, preferences.incomeCategories, preferences.language, savingsGoals, shoppingItems, validTransactions])
 
   const results = useMemo(() => {
     const term = normalize(query.trim())

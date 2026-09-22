@@ -3,7 +3,6 @@ export type TransactionType = 'income' | 'expense'
 export interface AppPreferences {
   theme: 'light' | 'dark'
   language: 'ka' | 'en' | 'ru' | 'tr'
-  currency: Currency
   readNotificationIds: string[]
   notifications: {
     enabled: boolean
@@ -12,13 +11,10 @@ export interface AppPreferences {
     savings: boolean
     reminders: boolean
   }
-  financialPeriodStartDay: number
   incomeCategories: string[]
   expenseCategories: string[]
   hideNotificationAmounts: boolean
 }
-
-export type Currency = 'GEL' | 'USD' | 'EUR'
 
 export interface FamilyMember {
   id: string

@@ -10,7 +10,7 @@ const icons = { wallet: Wallet, bank: Landmark, 'piggy-bank': PiggyBank }
 
 export function AccountsPage() {
   const { accounts, validTransactions: transactions, preferences, addAccount, updateAccount, deleteAccount } = useFinance()
-  const money = (value: number) => formatCurrency(value, preferences.currency, localeMap[preferences.language])
+  const money = (value: number) => formatCurrency(value, localeMap[preferences.language])
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<typeof accounts[number]>()
   const saveAccount = (values: Record<string, string>) => { const input = { name: values.name.trim(), icon: editing?.icon ?? 'wallet', openingBalance: Number(values.openingBalance), type: 'სხვა' }; if (!Number.isFinite(input.openingBalance) || input.openingBalance < 0) return; if (editing) updateAccount(editing.id, { ...editing, ...input }); else addAccount(input); setFormOpen(false); setEditing(undefined) }

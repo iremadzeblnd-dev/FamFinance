@@ -10,7 +10,7 @@ interface BudgetProgressProps {
 
 export function BudgetProgress({ category, spent, limit }: BudgetProgressProps) {
   const { preferences } = useFinance()
-  const money = (value: number) => formatCurrency(value, preferences.currency, localeMap[preferences.language])
+  const money = (value: number) => formatCurrency(value, localeMap[preferences.language])
   const percent = Math.min((spent / limit) * 100, 100)
   const percentText = `${Math.round((spent / limit) * 100)}%`
   const isWarning = percent >= 80

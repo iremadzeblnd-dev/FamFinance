@@ -33,7 +33,7 @@ export function NotificationCenter() {
     const items: FinancialNotification[] = []
     if (!preferences.notifications.enabled) return items
     const notificationText = (key: string) => translate(preferences.language, key)
-    const formatMoney = (value: number) => preferences.hideNotificationAmounts ? '••••' : formatCurrency(value, preferences.currency, locale)
+    const formatMoney = (value: number) => preferences.hideNotificationAmounts ? '••••' : formatCurrency(value, locale)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const dateFormatter = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })

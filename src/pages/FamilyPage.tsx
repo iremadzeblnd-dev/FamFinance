@@ -39,7 +39,7 @@ export function FamilyPage() {
   const householdExpense = visibleTransactions.filter((item) => item.type === 'expense').reduce((sum, item) => sum + item.amount, 0)
   const locale = localeMap[preferences.language]
   const addCopy = addMemberText[preferences.language]
-  const money = (value: number) => formatCurrency(value, preferences.currency, locale)
+  const money = (value: number) => formatCurrency(value, locale)
 
   const openCreateTransaction = (type: TransactionType) => { setTransactionType(type); setEditingTransaction(undefined); setTransactionOpen(true) }
   const openEditTransaction = (transaction: Transaction) => { setTransactionType(transaction.type); setEditingTransaction(transaction); setTransactionOpen(true) }
@@ -131,6 +131,6 @@ function AddFamilyMemberModal({ open, copy, onClose, onAdd }: { open: boolean; c
 
 function MemberDetails({ member, transactions, onIncome, onExpense, onEdit, onDelete }: { member: FamilyMember; transactions: Transaction[]; onIncome: () => void; onExpense: () => void; onEdit: (transaction: Transaction) => void; onDelete: (id: string) => void }) {
   const { preferences } = useFinance()
-  const money = (value: number) => formatCurrency(value, preferences.currency, localeMap[preferences.language])
+  const money = (value: number) => formatCurrency(value, localeMap[preferences.language])
   return <div className="mt-4 border-t border-slate-200 pt-4"><div className="flex items-center justify-between"><h3 className="font-semibold text-slate-900">{member.name} — ტრანზაქციები</h3><button type="button" onClick={() => document.activeElement instanceof HTMLElement && document.activeElement.blur()} className="text-slate-400" aria-label="დეტალები"><X className="h-4 w-4" /></button></div><div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={onIncome} className="min-h-11 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-medium text-white">+ შემოსავალი</button><button type="button" onClick={onExpense} className="min-h-11 rounded-xl bg-rose-600 px-3 py-2 text-sm font-medium text-white">+ ხარჯი</button></div><div className="mt-4 space-y-2">{transactions.length === 0 ? <p className="py-4 text-center text-sm text-slate-500">ამ თვეში ტრანზაქციები არ არის</p> : transactions.map((item) => <div key={item.id} className="flex items-center justify-between gap-2 rounded-2xl border border-slate-200 p-3"><div className="flex min-w-0 items-center gap-2">{item.type === 'income' ? <ArrowDownLeft className="h-4 w-4 shrink-0 text-emerald-600" /> : <ArrowUpRight className="h-4 w-4 shrink-0 text-rose-600" />}<div className="min-w-0"><p className="truncate font-medium text-slate-800">{item.description || item.category}</p><p className="text-xs text-slate-500">{item.category} · {formatDate(item.date)}</p></div></div><div className="flex items-center gap-2"><span className={`font-semibold ${item.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>{item.type === 'income' ? '+' : '-'}{money(item.amount)}</span><button type="button" onClick={() => onEdit(item)} className="text-xs text-slate-500">რედაქტირება</button><button type="button" onClick={() => onDelete(item.id)} className="text-xs text-rose-600">წაშლა</button></div></div>)}</div></div>
 }

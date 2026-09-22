@@ -1,5 +1,5 @@
 import type { Account, AppPreferences, Budget, Debt, FamilyMember, SavingsGoal, ShoppingItem, Transaction } from '../types/app'
-import type { FinanceStateData } from './storage'
+import { normalizePreferences, type FinanceStateData } from './storage'
 
 type Row = Record<string, unknown>
 type TableName = 'family_members' | 'transactions' | 'accounts' | 'budgets' | 'debts' | 'savings_goals' | 'shopping_items'
@@ -97,7 +97,7 @@ export async function fetchFinanceState(userId: string, fallbackPreferences: App
   const debts = (debtsResult.data ?? []) as Row[]
   const savings = (savingsResult.data ?? []) as Row[]
   const shopping = (shoppingResult.data ?? []) as Row[]
-  const preferences = ((settingsResult.data as Row | null)?.preferences as AppPreferences | undefined) ?? fallbackPreferences
+  const preferences = normalizePreferences((settingsResult.data as Row | null)?.preferences, fallbackPreferences)
   return {
     transactions: transactions.map((row): Transaction => ({ id: String(row.id), type: row.type as Transaction['type'], amount: number(row.amount), category: String(row.category), description: String(row.description), date: String(row.occurred_on), accountId: String(row.account_id), familyMemberId: optionalString(row.family_member_id), expenseScope: optionalString(row.expense_scope) as Transaction['expenseScope'], attachments: Array.isArray(row.attachments) ? (row.attachments as Transaction['attachments']) : [], receiptAttachment: row.receipt_attachment as Transaction['receiptAttachment'], createdAt: optionalString(row.source_created_at) ?? optionalString(row.created_at), updatedAt: optionalString(row.source_updated_at) ?? optionalString(row.updated_at) })),
     accounts: accounts.map((row): Account => ({ id: String(row.id), name: String(row.name), icon: String(row.icon), type: optionalString(row.type), openingBalance: row.opening_balance === null ? undefined : number(row.opening_balance), balance: row.legacy_balance === null ? undefined : number(row.legacy_balance), description: optionalString(row.description) })),

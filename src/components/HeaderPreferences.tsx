@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Check, Globe2, Moon, Sun } from 'lucide-react'
 import { useFinance } from '../state/FinanceContext'
 import { translate, type Language } from '../i18n/translations'
-import type { Currency } from '../types/app'
 
 const languages: { id: Language; label: string }[] = [
   { id: 'ka', label: 'ქართული' },
@@ -11,14 +10,8 @@ const languages: { id: Language; label: string }[] = [
   { id: 'tr', label: 'Türkçe' },
 ]
 
-const currencies: { id: Currency; label: string }[] = [
-  { id: 'GEL', label: '₾ GEL' },
-  { id: 'USD', label: '$ USD' },
-  { id: 'EUR', label: '€ EUR' },
-]
-
-export function HeaderPreferences({ showCurrency = true }: { showCurrency?: boolean }) {
-  const { preferences, setTheme, setLanguage, setCurrency } = useFinance()
+export function HeaderPreferences() {
+  const { preferences, setTheme, setLanguage } = useFinance()
   const [isLanguageOpen, setIsLanguageOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const t = (key: string) => translate(preferences.language, key)
@@ -44,9 +37,6 @@ export function HeaderPreferences({ showCurrency = true }: { showCurrency?: bool
 
   return (
     <div className="flex items-center gap-2">
-      {showCurrency ? <select value={preferences.currency} onChange={(event) => setCurrency(event.target.value as Currency)} className="h-10 w-[5.25rem] shrink-0 rounded-xl border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 outline-none transition hover:bg-slate-50 focus:ring-2 focus:ring-emerald-500" aria-label={t('header.currency')} title={t('header.currency')}>
-        {currencies.map(({ id, label }) => <option key={id} value={id}>{label}</option>)}
-      </select> : null}
       <button type="button" onClick={() => setTheme(nextTheme)} className={buttonClass} title={t(nextTheme === 'dark' ? 'header.enableDark' : 'header.enableLight')} aria-label={t(nextTheme === 'dark' ? 'header.enableDark' : 'header.enableLight')} aria-pressed={preferences.theme === 'dark'}>
         {preferences.theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       </button>

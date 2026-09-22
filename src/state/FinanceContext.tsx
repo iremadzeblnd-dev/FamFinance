@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { clearPendingFinanceSync, getFinanceStorageInfo, getLegacyImportOwner, hasPendingFinanceSync, loadFinanceState, markLegacyFinanceImported, markPendingFinanceSync, parseFinanceBackup, saveFinanceState, type FinanceStateData } from '../services/storage'
-import type { Account, AppPreferences, Budget, Currency, Debt, FamilyMember, SavingsGoal, ShoppingItem, Transaction, TransactionType } from '../types/app'
+import type { Account, AppPreferences, Budget, Debt, FamilyMember, SavingsGoal, ShoppingItem, Transaction, TransactionType } from '../types/app'
 import type { Language, Theme } from '../i18n/translations'
 import { deleteAttachmentBlobs } from '../services/attachmentStorage'
 import { defaultExpenseCategories, defaultIncomeCategories } from '../data/categories'
@@ -18,7 +18,7 @@ const emptyState: FinanceStateData = {
   debts: [],
   savingsGoals: [],
   shoppingItems: [],
-  preferences: { theme: 'light', language: 'ka', currency: 'GEL', readNotificationIds: [], notifications: { enabled: true, debts: true, budgets: true, savings: true, reminders: true }, financialPeriodStartDay: 1, incomeCategories: defaultIncomeCategories, expenseCategories: defaultExpenseCategories, hideNotificationAmounts: false },
+  preferences: { theme: 'light', language: 'ka', readNotificationIds: [], notifications: { enabled: true, debts: true, budgets: true, savings: true, reminders: true }, incomeCategories: defaultIncomeCategories, expenseCategories: defaultExpenseCategories, hideNotificationAmounts: false },
 }
 
 interface FinanceContextValue extends FinanceStateData {
@@ -57,7 +57,6 @@ interface FinanceContextValue extends FinanceStateData {
   preferences: AppPreferences
   setTheme: (theme: Theme) => void
   setLanguage: (language: Language) => void
-  setCurrency: (currency: Currency) => void
   markNotificationsRead: (ids: string[]) => void
   updatePreferences: (input: Partial<AppPreferences>) => void
   restoreFinanceData: (input: unknown) => boolean
@@ -242,7 +241,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       clearPurchasedShoppingItems: () => update({ ...state, shoppingItems: state.shoppingItems.filter((item) => item.status !== 'purchased') }),
       setTheme: (theme) => update({ ...state, preferences: { ...state.preferences, theme } }),
       setLanguage: (language) => update({ ...state, preferences: { ...state.preferences, language } }),
-      setCurrency: (currency) => update({ ...state, preferences: { ...state.preferences, currency } }),
       markNotificationsRead: (ids) => update({ ...state, preferences: { ...state.preferences, readNotificationIds: Array.from(new Set([...state.preferences.readNotificationIds, ...ids])) } }),
       updatePreferences: (input) => update({ ...state, preferences: { ...state.preferences, ...input } }),
       restoreFinanceData: (input) => { const restored = parseFinanceBackup(input, emptyState); if (!restored) return false; setState(restored); return true },

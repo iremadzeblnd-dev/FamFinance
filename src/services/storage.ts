@@ -1,5 +1,4 @@
 import type { Account, AppPreferences, Budget, Debt, FamilyMember, SavingsGoal, ShoppingItem, Transaction } from '../types/app'
-import { defaultExpenseCategories, defaultIncomeCategories } from '../data/categories'
 
 export interface FinanceStateData {
   transactions: Transaction[]
@@ -27,6 +26,29 @@ const isRecord = (value: unknown): value is Record<string, unknown> => typeof va
 
 const isArray = (value: unknown): value is unknown[] => Array.isArray(value)
 
+export function normalizePreferences(value: unknown, fallback: AppPreferences): AppPreferences {
+  const preferences = isRecord(value) ? value : {}
+  const notifications: Record<string, unknown> = isRecord(preferences.notifications) ? preferences.notifications : {}
+  const cleanCategories = (candidate: unknown, defaultItems: string[]) => isArray(candidate)
+    ? candidate.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+    : defaultItems
+  return {
+    theme: preferences.theme === 'dark' ? 'dark' : 'light',
+    language: preferences.language === 'en' || preferences.language === 'ru' || preferences.language === 'tr' ? preferences.language : 'ka',
+    readNotificationIds: isArray(preferences.readNotificationIds) ? preferences.readNotificationIds.filter((id): id is string => typeof id === 'string') : [],
+    notifications: {
+      enabled: notifications.enabled !== false,
+      debts: notifications.debts !== false,
+      budgets: notifications.budgets !== false,
+      savings: notifications.savings !== false,
+      reminders: notifications.reminders !== false,
+    },
+    incomeCategories: cleanCategories(preferences.incomeCategories, fallback.incomeCategories),
+    expenseCategories: cleanCategories(preferences.expenseCategories, fallback.expenseCategories),
+    hideNotificationAmounts: preferences.hideNotificationAmounts === true,
+  }
+}
+
 const memberFallbackDate = (memberId: string, transactions: Transaction[]) => {
   const memberDates = transactions.filter((item) => item.familyMemberId === memberId).map((item) => item.date).sort()
   const allDates = transactions.map((item) => item.date).sort()
@@ -41,10 +63,7 @@ export function loadFinanceState(seed: FinanceStateData, userId?: string): Finan
     if (!isRecord(parsed) || parsed.version !== STORAGE_VERSION || !isRecord(parsed.data)) return seed
     const data = parsed.data
     if (![data.transactions, data.accounts, data.budgets, data.familyMembers, data.debts, data.savingsGoals].every(isArray)) return seed
-    const preferences = isRecord(data.preferences) ? data.preferences as Partial<AppPreferences> : {}
-    const notifications: Record<string, unknown> = isRecord(preferences.notifications) ? preferences.notifications : {}
-    const cleanCategories = (value: unknown, fallback: string[]) => isArray(value) ? value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim())) : fallback
-    const state = { ...data, shoppingItems: isArray(data.shoppingItems) ? data.shoppingItems : [], preferences: { theme: preferences.theme === 'dark' ? 'dark' : 'light', language: preferences.language === 'en' || preferences.language === 'ru' || preferences.language === 'tr' ? preferences.language : 'ka', currency: preferences.currency === 'USD' || preferences.currency === 'EUR' ? preferences.currency : 'GEL', readNotificationIds: isArray(preferences.readNotificationIds) ? preferences.readNotificationIds.filter((id): id is string => typeof id === 'string') : [], notifications: { enabled: notifications.enabled !== false, debts: notifications.debts !== false, budgets: notifications.budgets !== false, savings: notifications.savings !== false, reminders: notifications.reminders !== false }, financialPeriodStartDay: typeof preferences.financialPeriodStartDay === 'number' && preferences.financialPeriodStartDay >= 1 && preferences.financialPeriodStartDay <= 28 ? Math.floor(preferences.financialPeriodStartDay) : 1, incomeCategories: cleanCategories(preferences.incomeCategories, defaultIncomeCategories), expenseCategories: cleanCategories(preferences.expenseCategories, defaultExpenseCategories), hideNotificationAmounts: preferences.hideNotificationAmounts === true } } as unknown as FinanceStateData
+    const state = { ...data, shoppingItems: isArray(data.shoppingItems) ? data.shoppingItems : [], preferences: normalizePreferences(data.preferences, seed.preferences) } as unknown as FinanceStateData
     state.familyMembers = state.familyMembers.map((member) => ({ ...member, createdAt: typeof member.createdAt === 'string' && /^\d{4}-\d{2}-\d{2}/.test(member.createdAt) ? member.createdAt.slice(0, 10) : memberFallbackDate(member.id, state.transactions) }))
     state.savingsGoals = state.savingsGoals.map(({ id, name, targetAmount, targetDate, linkedAccountId }) => ({ id, name, targetAmount, targetDate, linkedAccountId }))
     return state

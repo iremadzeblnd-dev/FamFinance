@@ -28,7 +28,7 @@ const estimateLabel = (remaining: number, surplus: number | null) => {
 
 export function SavingsPage() {
   const { savingsGoals, validTransactions: transactions, accounts, preferences, addSavingsGoal, updateSavingsGoal, deleteSavingsGoal } = useFinance()
-  const money = (value: number) => formatCurrency(value, preferences.currency, localeMap[preferences.language])
+  const money = (value: number) => formatCurrency(value, localeMap[preferences.language])
   const [formOpen, setFormOpen] = useState(false)
   const [editingGoal, setEditingGoal] = useState<typeof savingsGoals[number]>()
   const [plannerGoalId, setPlannerGoalId] = useState<string>()

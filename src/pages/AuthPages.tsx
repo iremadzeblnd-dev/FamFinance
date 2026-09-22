@@ -19,7 +19,7 @@ const pendingConfirmationEmailKey = 'finance-pending-confirmation-email'
 function AuthLayout({ title, help, children }: { title: string; help: string; children: ReactNode }) {
   const { preferences } = useFinance()
   return <div className={`theme-${preferences.theme} min-h-screen bg-slate-100 px-4 py-6 text-slate-900 sm:px-6`}>
-    <div className="mx-auto flex max-w-6xl justify-end"><HeaderPreferences showCurrency={false} /></div>
+    <div className="mx-auto flex max-w-6xl justify-end"><HeaderPreferences /></div>
     <div className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-6xl items-center justify-center py-8">
       <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl sm:p-8">
         <div className="mb-7 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white"><LockKeyhole className="h-6 w-6" /></div>

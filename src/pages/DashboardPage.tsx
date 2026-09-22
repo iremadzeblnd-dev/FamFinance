@@ -18,7 +18,7 @@ interface DashboardPageProps { onOpenTransaction: (type: 'income' | 'expense') =
 export function DashboardPage({ onOpenTransaction }: DashboardPageProps) {
   const { validTransactions: transactions, budgets, savingsGoals, accounts, preferences } = useFinance()
   const locale = localeMap[preferences.language]
-  const money = (value: number) => formatCurrency(value, preferences.currency, locale)
+  const money = (value: number) => formatCurrency(value, locale)
   const [month, setMonth] = useState('2026-09')
   const income = calculateIncome(transactions, month)
   const expense = calculateExpenses(transactions, month)

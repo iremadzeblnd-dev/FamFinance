@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { MessageCircle, Send, X } from 'lucide-react'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { Language } from '../i18n/translations'
 import { familyChatService, type FamilyMessage } from '../services/familyChatService'
 import { useAuth } from '../state/AuthContext'
@@ -27,43 +28,65 @@ export function FamilyChat() {
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
+  const [membershipVersion, setMembershipVersion] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!open || !user) return
     let active = true
-    let channel: Awaited<ReturnType<typeof familyChatService.subscribe>> | undefined
+    let messageChannel: RealtimeChannel | undefined
+    let membershipChannel: RealtimeChannel | undefined
     setLoading(true)
     setError('')
     setMessages([])
-    void familyChatService.getFamilyId(user.id).then(async (nextFamilyId) => {
-      if (!active) return
-      if (!nextFamilyId) {
-        setError(copy.noFamily)
+    const connect = async () => {
+      const membershipSubscription = await familyChatService.subscribeToMembership(user.id, () => {
+        if (active) setMembershipVersion((version) => version + 1)
+      })
+      membershipChannel = membershipSubscription.channel
+      if (!active) {
+        void familyChatService.unsubscribe(membershipChannel)
+        membershipChannel = undefined
         return
       }
+      await membershipSubscription.ready
+      if (!active) return
+
+      const nextFamilyId = await familyChatService.getFamilyId(user.id)
+      if (!nextFamilyId) throw new Error(copy.noFamily)
       setFamilyId(nextFamilyId)
-      const nextChannel = await familyChatService.subscribe(nextFamilyId, (message) => {
+
+      const messageSubscription = await familyChatService.subscribe(nextFamilyId, (message) => {
         if (active) setMessages((current) => addMessage(current, message))
       })
+      messageChannel = messageSubscription.channel
       if (!active) {
-        void familyChatService.unsubscribe(nextChannel)
+        void familyChatService.unsubscribe(messageChannel)
+        messageChannel = undefined
         return
       }
-      channel = nextChannel
+      await messageSubscription.ready
+      if (!active) return
+
       const loaded = await familyChatService.listMessages(nextFamilyId)
       if (active) setMessages((current) => loaded.reduce(addMessage, current))
-    }).catch(() => {
-      if (active) setError(copy.unavailable)
+    }
+    void connect().catch((connectError: unknown) => {
+      if (messageChannel) void familyChatService.unsubscribe(messageChannel)
+      if (membershipChannel) void familyChatService.unsubscribe(membershipChannel)
+      messageChannel = undefined
+      membershipChannel = undefined
+      if (active) setError(connectError instanceof Error && connectError.message === copy.noFamily ? copy.noFamily : copy.unavailable)
     }).finally(() => {
       if (active) setLoading(false)
     })
     return () => {
       active = false
       setFamilyId(undefined)
-      if (channel) void familyChatService.unsubscribe(channel)
+      if (messageChannel) void familyChatService.unsubscribe(messageChannel)
+      if (membershipChannel) void familyChatService.unsubscribe(membershipChannel)
     }
-  }, [copy.noFamily, copy.unavailable, open, user])
+  }, [copy.noFamily, copy.unavailable, membershipVersion, open, user])
 
   useEffect(() => {
     if (!open) return

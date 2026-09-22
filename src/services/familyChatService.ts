@@ -20,6 +20,16 @@ interface FamilyMessageRow {
   created_at: string
 }
 
+interface FamilyMembershipRow {
+  user_id: string
+  family_id: string
+}
+
+export interface FamilyChatSubscription {
+  channel: RealtimeChannel
+  ready: Promise<void>
+}
+
 const toMessage = (row: FamilyMessageRow): FamilyMessage => ({
   id: row.id,
   familyId: row.family_id,
@@ -33,6 +43,22 @@ const requireData = <T>(data: T | null, error: { message: string } | null): T =>
   if (error) throw new Error(error.message)
   if (data === null) throw new Error('Family chat data is unavailable')
   return data
+}
+
+const startSubscription = (channel: RealtimeChannel): FamilyChatSubscription => {
+  let settled = false
+  const ready = new Promise<void>((resolve, reject) => {
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED' && !settled) {
+        settled = true
+        resolve()
+      } else if ((status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') && !settled) {
+        settled = true
+        reject(new Error(`Realtime subscription failed: ${status}`))
+      }
+    })
+  })
+  return { channel, ready }
 }
 
 export const familyChatService = {
@@ -60,9 +86,9 @@ export const familyChatService = {
     return requireData(data, error).reverse().map((row) => toMessage(row as FamilyMessageRow))
   },
 
-  async subscribe(familyId: string, onMessage: (message: FamilyMessage) => void): Promise<RealtimeChannel> {
+  async subscribe(familyId: string, onMessage: (message: FamilyMessage) => void): Promise<FamilyChatSubscription> {
     const { supabase } = await loadClient()
-    return supabase
+    const channel = supabase
       .channel(`family-chat:${familyId}`)
       .on('postgres_changes', {
         event: 'INSERT',
@@ -70,7 +96,23 @@ export const familyChatService = {
         table: 'family_messages',
         filter: `family_id=eq.${familyId}`,
       }, (payload) => onMessage(toMessage(payload.new as FamilyMessageRow)))
-      .subscribe()
+    return startSubscription(channel)
+  },
+
+  async subscribeToMembership(userId: string, onFamilyChanged: (familyId: string) => void): Promise<FamilyChatSubscription> {
+    const { supabase } = await loadClient()
+    const channel = supabase
+      .channel(`family-chat-membership:${userId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'family_chat_members',
+        filter: `user_id=eq.${userId}`,
+      }, (payload) => {
+        const membership = payload.new as FamilyMembershipRow
+        if (membership.user_id === userId && membership.family_id) onFamilyChanged(membership.family_id)
+      })
+    return startSubscription(channel)
   },
 
   async sendMessage(familyId: string, text: string) {

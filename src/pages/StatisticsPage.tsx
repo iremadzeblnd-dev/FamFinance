@@ -6,7 +6,7 @@ import { localeMap } from '../i18n/translations'
 
 export function StatisticsPage() {
   const { validTransactions: transactions, savingsGoals, preferences } = useFinance()
-  const money = (value: number) => formatCurrency(value, preferences.currency, localeMap[preferences.language])
+  const money = (value: number) => formatCurrency(value, localeMap[preferences.language])
   const months = Array.from(new Set(transactions.map((item) => monthKey(item.date)))).sort()
   const monthlyStats = months.map((month) => ({ month, income: calculateIncome(transactions, month), expense: calculateExpenses(transactions, month), savings: calculateSavings(savingsGoals) }))
   const categories = Array.from(new Set(transactions.map((item) => item.category))).map((name) => ({ name, value: transactions.filter((item) => item.type === 'expense' && item.category === name).reduce((sum, item) => sum + item.amount, 0) }))

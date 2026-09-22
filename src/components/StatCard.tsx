@@ -32,7 +32,7 @@ export function StatCard({ title, amount, comparison, icon: Icon, accent = 'neut
       </div>
 
       <div className="flex items-end justify-between gap-2">
-        <p className="text-2xl font-bold text-slate-900">{formatCurrency(amount, preferences.currency, localeMap[preferences.language])}</p>
+        <p className="text-2xl font-bold text-slate-900">{formatCurrency(amount, localeMap[preferences.language])}</p>
       </div>
 
       {comparison ? <p className="mt-3 text-xs text-slate-500">{comparison}</p> : null}

@@ -51,7 +51,7 @@ export function Sidebar() {
           <CircleDollarSign className="h-4 w-4" />
           <span className="text-xs font-semibold uppercase tracking-wide">დღევანდელი მდგომარეობა</span>
         </div>
-        <p className="text-2xl font-bold text-slate-900">{formatCurrency(currentBalance, preferences.currency, localeMap[preferences.language])}</p>
+        <p className="text-2xl font-bold text-slate-900">{formatCurrency(currentBalance, localeMap[preferences.language])}</p>
         <p className="text-xs text-emerald-700">დარჩენილი</p>
       </div>
     </aside>

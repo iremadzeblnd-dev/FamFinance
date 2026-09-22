@@ -47,7 +47,7 @@ export function TransactionList({ transactions, limit }: TransactionListProps) {
 
             <div className="text-right">
               <p className={`font-semibold ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}>
-                {isIncome ? '+' : '-'}{formatCurrency(item.amount, preferences.currency, localeMap[preferences.language])}
+                {isIncome ? '+' : '-'}{formatCurrency(item.amount, localeMap[preferences.language])}
               </p>
             </div>
           </div>
