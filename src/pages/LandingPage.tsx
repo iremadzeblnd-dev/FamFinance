@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import { ArrowRight, BarChart3, Landmark, MessageCircle, PiggyBank, ReceiptText, ShieldCheck, Target, UsersRound, WalletCards } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { HeaderPreferences } from '../components/HeaderPreferences'
 import type { Language } from '../i18n/translations'
@@ -10,7 +11,7 @@ const landingText = {
     navBenefits: 'შესაძლებლობები', navHow: 'როგორ მუშაობს', navAbout: 'ჩვენ შესახებ', login: 'შესვლა', register: 'რეგისტრაცია', eyebrow: 'ოჯახის ფინანსები ერთ სივრცეში',
     title: 'მართეთ ოჯახის ფინანსები მარტივად და ერთად',
     description: 'FamFinance გაძლევთ სრულ სურათს შემოსავლებზე, ხარჯებზე, ბიუჯეტებზე და საერთო ფინანსურ მიზნებზე — უსაფრთხოდ, გასაგებად და მთელი ოჯახისთვის.',
-    primaryCta: 'დაიწყე უფასოდ', secondaryCta: 'შესვლა', previewTitle: 'თქვენი ფინანსური სივრცე', previewText: 'ყველა მნიშვნელოვანი მონაცემი ერთ ორგანიზებულ დაფაზე.', previewDemo: 'დემო მონაცემები', previewIncome: 'შემოსავალი', previewExpense: 'ხარჯი', previewSavings: 'დანაზოგი', previewBalance: 'ბალანსი', previewProgress: 'თვიური განაწილება',
+    primaryCta: 'დაიწყე უფასოდ', secondaryCta: 'შესვლა', previewTitle: 'თქვენი ფინანსური სივრცე', previewText: 'ყველა მნიშვნელოვანი ფინანსური ინფორმაცია ერთ სივრცეში.', previewDemo: 'ფინანსების მოკლე მიმოხილვა', previewIncome: 'შემოსავალი', previewExpense: 'ხარჯი', previewSavings: 'დანაზოგი', previewBalance: 'ბალანსი', previewProgress: 'ხარჯების წილი შემოსავალში —', previewActivity: 'ბოლო მოძრაობა', previewTransactions: [['ხელფასი', 'შემოსავალი'], ['სურსათი', 'ხარჯი'], ['კომუნალური', 'ხარჯი']],
     benefitsEyebrow: 'ყველაფერი, რაც გჭირდებათ', benefitsTitle: 'ოჯახის ფინანსების სრული მართვა', benefitsDescription: 'აკონტროლეთ ყოველდღიური მოძრაობა, დაგეგმეთ მომავალი და დარჩით კავშირზე ოჯახის წევრებთან.',
     benefits: [
       ['შემოსავლები და ხარჯები', 'ჩაწერეთ და მოძებნეთ ყველა ფინანსური მოძრაობა ერთ სივრცეში.'],
@@ -30,7 +31,7 @@ const landingText = {
     navBenefits: 'Features', navHow: 'How it works', navAbout: 'About us', login: 'Sign in', register: 'Register', eyebrow: 'Family finances in one place',
     title: 'Manage your family finances simply, together',
     description: 'FamFinance gives you a complete view of income, expenses, budgets, and shared financial goals—securely, clearly, and for the whole family.',
-    primaryCta: 'Get started free', secondaryCta: 'Sign in', previewTitle: 'Your financial workspace', previewText: 'Every important detail on one organized dashboard.', previewDemo: 'Demo data', previewIncome: 'Income', previewExpense: 'Expenses', previewSavings: 'Savings', previewBalance: 'Balance', previewProgress: 'Monthly allocation',
+    primaryCta: 'Get started free', secondaryCta: 'Sign in', previewTitle: 'Your financial workspace', previewText: 'Every important detail on one organized dashboard.', previewDemo: 'Demo data', previewIncome: 'Income', previewExpense: 'Expenses', previewSavings: 'Savings', previewBalance: 'Balance', previewProgress: 'Expenses as a share of income —', previewActivity: 'Latest activity', previewTransactions: [['Salary', 'Income'], ['Groceries', 'Expense'], ['Utilities', 'Expense']],
     benefitsEyebrow: 'Everything you need', benefitsTitle: 'Complete family finance management', benefitsDescription: 'Track daily activity, plan ahead, and stay connected with your family.',
     benefits: [
       ['Income and expenses', 'Record and find every financial movement in one place.'],
@@ -50,7 +51,7 @@ const landingText = {
     navBenefits: 'Возможности', navHow: 'Как это работает', navAbout: 'О нас', login: 'Войти', register: 'Регистрация', eyebrow: 'Семейные финансы в одном месте',
     title: 'Управляйте семейными финансами просто и вместе',
     description: 'FamFinance показывает полную картину доходов, расходов, бюджетов и общих финансовых целей — безопасно, понятно и для всей семьи.',
-    primaryCta: 'Начать бесплатно', secondaryCta: 'Войти', previewTitle: 'Ваше финансовое пространство', previewText: 'Все важные данные на одной организованной панели.', previewDemo: 'Демо-данные', previewIncome: 'Доход', previewExpense: 'Расходы', previewSavings: 'Сбережения', previewBalance: 'Баланс', previewProgress: 'Распределение за месяц',
+    primaryCta: 'Начать бесплатно', secondaryCta: 'Войти', previewTitle: 'Ваше финансовое пространство', previewText: 'Все важные данные на одной организованной панели.', previewDemo: 'Демо-данные', previewIncome: 'Доход', previewExpense: 'Расходы', previewSavings: 'Сбережения', previewBalance: 'Баланс', previewProgress: 'Доля расходов в доходе —', previewActivity: 'Последняя операция', previewTransactions: [['Зарплата', 'Доход'], ['Продукты', 'Расход'], ['Коммунальные услуги', 'Расход']],
     benefitsEyebrow: 'Всё необходимое', benefitsTitle: 'Полное управление семейными финансами', benefitsDescription: 'Контролируйте ежедневные операции, планируйте будущее и оставайтесь на связи с семьёй.',
     benefits: [
       ['Доходы и расходы', 'Записывайте и находите все финансовые операции в одном месте.'],
@@ -70,7 +71,7 @@ const landingText = {
     navBenefits: 'Özellikler', navHow: 'Nasıl çalışır', navAbout: 'Hakkımızda', login: 'Giriş yap', register: 'Kayıt ol', eyebrow: 'Aile finansı tek bir yerde',
     title: 'Aile finansınızı kolayca ve birlikte yönetin',
     description: 'FamFinance; gelir, gider, bütçe ve ortak finansal hedeflerinizi güvenli, anlaşılır ve tüm aileye uygun şekilde tek yerde gösterir.',
-    primaryCta: 'Ücretsiz başlayın', secondaryCta: 'Giriş yap', previewTitle: 'Finans çalışma alanınız', previewText: 'Tüm önemli bilgiler düzenli tek bir panelde.', previewDemo: 'Demo verileri', previewIncome: 'Gelir', previewExpense: 'Gider', previewSavings: 'Birikim', previewBalance: 'Bakiye', previewProgress: 'Aylık dağılım',
+    primaryCta: 'Ücretsiz başlayın', secondaryCta: 'Giriş yap', previewTitle: 'Finans çalışma alanınız', previewText: 'Tüm önemli bilgiler düzenli tek bir panelde.', previewDemo: 'Demo verileri', previewIncome: 'Gelir', previewExpense: 'Gider', previewSavings: 'Birikim', previewBalance: 'Bakiye', previewProgress: 'Giderlerin gelire oranı —', previewActivity: 'Son hareket', previewTransactions: [['Maaş', 'Gelir'], ['Market', 'Gider'], ['Faturalar', 'Gider']],
     benefitsEyebrow: 'İhtiyacınız olan her şey', benefitsTitle: 'Eksiksiz aile finansı yönetimi', benefitsDescription: 'Günlük hareketleri takip edin, geleceği planlayın ve ailenizle bağlantıda kalın.',
     benefits: [
       ['Gelir ve giderler', 'Tüm finansal hareketleri tek yerde kaydedin ve bulun.'],
@@ -90,10 +91,39 @@ const landingText = {
 
 const benefitIcons: LucideIcon[] = [ReceiptText, WalletCards, Landmark, Target, UsersRound, BarChart3, MessageCircle]
 const whyIcons: LucideIcon[] = [PiggyBank, UsersRound, ShieldCheck, BarChart3]
+const demoSnapshots = [
+  { income: '2,500 ₾', expense: '1,200 ₾', savings: '1,300 ₾', balance: '1,300 ₾', percentage: 48, bars: [38, 56, 44, 72, 60, 84, 68], transaction: 0, transactionAmount: '+2,500 ₾', positive: true },
+  { income: '2,580 ₾', expense: '1,245 ₾', savings: '1,335 ₾', balance: '1,335 ₾', percentage: 48, bars: [46, 62, 51, 78, 66, 74, 88], transaction: 1, transactionAmount: '−85 ₾', positive: false },
+  { income: '2,650 ₾', expense: '1,290 ₾', savings: '1,360 ₾', balance: '1,360 ₾', percentage: 49, bars: [52, 48, 68, 61, 82, 70, 92], transaction: 2, transactionAmount: '−110 ₾', positive: false },
+] as const
 
 export function LandingPage() {
   const { preferences } = useFinance()
   const copy = landingText[preferences.language]
+  const reduceMotion = usePrefersReducedMotion()
+  const [demoIndex, setDemoIndex] = useState(0)
+  const [demoTransitioning, setDemoTransitioning] = useState(false)
+  const demo = demoSnapshots[demoIndex]
+  const [transactionTitle, transactionType] = copy.previewTransactions[demo.transaction]
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setDemoTransitioning(false)
+      return
+    }
+    let transitionTimer: number | undefined
+    const cycleTimer = window.setInterval(() => {
+      setDemoTransitioning(true)
+      transitionTimer = window.setTimeout(() => {
+        setDemoIndex((current) => (current + 1) % demoSnapshots.length)
+        setDemoTransitioning(false)
+      }, 250)
+    }, 3800)
+    return () => {
+      window.clearInterval(cycleTimer)
+      if (transitionTimer !== undefined) window.clearTimeout(transitionTimer)
+    }
+  }, [reduceMotion])
 
   return <div className={`theme-${preferences.theme} min-h-screen bg-slate-100 text-slate-900`}>
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
@@ -117,18 +147,24 @@ export function LandingPage() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><BarChart3 className="h-5 w-5" /></span>
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-between gap-2"><p className="text-sm leading-6 text-slate-500">{copy.previewText}</p><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">{copy.previewDemo}</span></div>
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <DemoMetric label={copy.previewIncome} value="2,500 ₾" tone="emerald" />
-                <DemoMetric label={copy.previewExpense} value="1,200 ₾" tone="rose" />
-                <DemoMetric label={copy.previewSavings} value="1,300 ₾" tone="blue" />
-                <DemoMetric label={copy.previewBalance} value="1,300 ₾" tone="emerald" />
+              <div className={`mt-5 grid grid-cols-2 gap-3 transition-all duration-300 ${demoTransitioning ? 'translate-y-1 opacity-30' : 'translate-y-0 opacity-100'}`} aria-live="polite">
+                <DemoMetric label={copy.previewIncome} value={demo.income} tone="emerald" />
+                <DemoMetric label={copy.previewExpense} value={demo.expense} tone="rose" />
+                <DemoMetric label={copy.previewSavings} value={demo.savings} tone="blue" />
+                <DemoMetric label={copy.previewBalance} value={demo.balance} tone="emerald" />
               </div>
               <div className="mt-4 rounded-2xl bg-slate-50 p-4">
-                <div className="flex items-center justify-between gap-3"><span className="text-xs font-semibold text-slate-600">{copy.previewProgress}</span><span className="text-xs font-bold text-emerald-700">52%</span></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-xs font-semibold text-slate-600">{copy.previewProgress}</span><span className="text-xs font-bold text-emerald-700">{demo.percentage}%</span></div>
                 <div className="mt-4 flex h-20 items-end justify-between gap-2" aria-hidden="true">
-                  {[38, 56, 44, 72, 60, 84, 68].map((height, index) => <span key={index} className="w-full rounded-t-md bg-emerald-500/80" style={{ height: `${height}%` }} />)}
+                  {demo.bars.map((height, index) => <span key={index} className="w-full rounded-t-md bg-emerald-500/80 transition-[height] duration-700 ease-out motion-reduce:transition-none" style={{ height: `${height}%` }} />)}
                 </div>
-                <div className="mt-3 flex h-2 overflow-hidden rounded-full"><span className="h-full w-[48%] bg-rose-400" /><span className="h-full w-[52%] bg-emerald-500" /></div>
+                <div className="mt-3 flex h-2 overflow-hidden rounded-full"><span className="h-full bg-rose-400 transition-[width] duration-700 ease-out motion-reduce:transition-none" style={{ width: `${demo.percentage}%` }} /><span className="h-full bg-emerald-500 transition-[width] duration-700 ease-out motion-reduce:transition-none" style={{ width: `${100 - demo.percentage}%` }} /></div>
+                <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-slate-400">{copy.previewActivity}</p>
+                <div className={`mt-2 flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm transition-all duration-300 motion-reduce:transition-none ${demoTransitioning ? 'translate-x-2 opacity-0' : 'translate-x-0 opacity-100'}`}>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><ReceiptText className="h-4 w-4" /></span>
+                  <span className="min-w-0 flex-1"><strong className="block truncate text-sm text-slate-800">{transactionTitle}</strong><span className="block text-xs text-slate-500">{transactionType}</span></span>
+                  <strong className={`shrink-0 text-sm ${demo.positive ? 'text-emerald-700' : 'text-rose-600'}`}>{demo.transactionAmount}</strong>
+                </div>
               </div>
             </div>
           </div>
@@ -153,4 +189,17 @@ export function LandingPage() {
 function DemoMetric({ label, value, tone }: { label: string; value: string; tone: 'emerald' | 'rose' | 'blue' }) {
   const toneClass = tone === 'emerald' ? 'bg-emerald-50 text-emerald-700' : tone === 'rose' ? 'bg-rose-50 text-rose-700' : 'bg-blue-50 text-blue-700'
   return <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><span className="text-xs font-medium text-slate-500">{label}</span><strong className={`mt-2 block rounded-lg px-2 py-1.5 text-base font-black sm:text-sm lg:text-base ${toneClass}`}>{value}</strong></div>
+}
+
+function usePrefersReducedMotion() {
+  const [reduceMotion, setReduceMotion] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const updatePreference = () => setReduceMotion(mediaQuery.matches)
+    mediaQuery.addEventListener('change', updatePreference)
+    return () => mediaQuery.removeEventListener('change', updatePreference)
+  }, [])
+
+  return reduceMotion
 }
