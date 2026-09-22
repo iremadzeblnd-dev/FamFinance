@@ -92,9 +92,9 @@ const landingText = {
 const benefitIcons: LucideIcon[] = [ReceiptText, WalletCards, Landmark, Target, UsersRound, BarChart3, MessageCircle]
 const whyIcons: LucideIcon[] = [PiggyBank, UsersRound, ShieldCheck, BarChart3]
 const demoSnapshots = [
-  { income: '2,500 ₾', expense: '1,200 ₾', savings: '1,300 ₾', balance: '1,300 ₾', percentage: 48, bars: [38, 56, 44, 72, 60, 84, 68], transaction: 0, transactionAmount: '+2,500 ₾', positive: true },
-  { income: '2,580 ₾', expense: '1,245 ₾', savings: '1,335 ₾', balance: '1,335 ₾', percentage: 48, bars: [46, 62, 51, 78, 66, 74, 88], transaction: 1, transactionAmount: '−85 ₾', positive: false },
-  { income: '2,650 ₾', expense: '1,290 ₾', savings: '1,360 ₾', balance: '1,360 ₾', percentage: 49, bars: [52, 48, 68, 61, 82, 70, 92], transaction: 2, transactionAmount: '−110 ₾', positive: false },
+  { income: '0 ₾', expense: '0 ₾', savings: '0 ₾', balance: '0 ₾', percentage: 0, bars: [38, 56, 44, 72, 60, 84, 68], transaction: 0, transactionAmount: '0 ₾', positive: true },
+  { income: '0 ₾', expense: '0 ₾', savings: '0 ₾', balance: '0 ₾', percentage: 0, bars: [46, 62, 51, 78, 66, 74, 88], transaction: 1, transactionAmount: '0 ₾', positive: false },
+  { income: '0 ₾', expense: '0 ₾', savings: '0 ₾', balance: '0 ₾', percentage: 0, bars: [52, 48, 68, 61, 82, 70, 92], transaction: 2, transactionAmount: '0 ₾', positive: false },
 ] as const
 
 export function LandingPage() {
