@@ -22,6 +22,7 @@ export type Currency = 'GEL' | 'USD' | 'EUR'
 
 export interface FamilyMember {
   id: string
+  authUserId?: string
   name: string
   createdAt?: string
   role?: string
