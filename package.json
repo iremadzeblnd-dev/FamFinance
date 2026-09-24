@@ -9,6 +9,7 @@
     "lint": "oxlint",
     "test:ocr": "tsx --test tests/receiptOcr.test.ts",
     "test:attachments": "tsx --test tests/attachments.test.ts",
+    "test:transactions": "tsx --test tests/transactionForm.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {

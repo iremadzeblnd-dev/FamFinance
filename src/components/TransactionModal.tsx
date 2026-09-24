@@ -9,6 +9,9 @@ import { transactionAttachments } from '../utils/attachments'
 import { formatCurrency } from '../utils/formatters'
 import { localeMap } from '../i18n/translations'
 import { defaultIncomeCategories } from '../data/categories'
+import { useAuth } from '../state/AuthContext'
+import { fetchTransactionFormOptions } from '../services/financeDatabase'
+import { mergeTransactionFormOptions, resolveTransactionSelectionIds } from '../utils/transactionForm'
 
 interface TransactionModalProps {
   isOpen: boolean
@@ -35,9 +38,12 @@ type OcrStatus = 'idle' | 'processing' | 'detected' | 'failed'
 
 export function TransactionModal({ isOpen, type, accounts, familyMembers, initialValue, onClose, onSave }: TransactionModalProps) {
   const { preferences } = useFinance()
+  const { user } = useAuth()
   const t = (key: string) => translate(preferences.language, key)
   const ocrRequestRef = useRef(0)
   const [form, setForm] = useState<TransactionFormValues>({ amount: 0, category: defaultIncomeCategories[0], description: '', date: new Date().toISOString().slice(0, 10), accountId: accounts[0]?.id ?? '', familyMemberId: familyMembers[0]?.id ?? '', expenseScope: 'personal', attachments: [] })
+  const [availableAccounts, setAvailableAccounts] = useState(accounts)
+  const [availableFamilyMembers, setAvailableFamilyMembers] = useState(familyMembers.filter((member) => !member.archived))
   const [error, setError] = useState('')
   const [isProcessingImage, setIsProcessingImage] = useState(false)
   const [ocrStatus, setOcrStatus] = useState<OcrStatus>('idle')
@@ -48,6 +54,9 @@ export function TransactionModal({ isOpen, type, accounts, familyMembers, initia
   useEffect(() => {
     ocrRequestRef.current += 1
     if (!isOpen) return
+    const localOptions = mergeTransactionFormOptions({ accounts, familyMembers }, { accounts: [], familyMembers: [] })
+    setAvailableAccounts(localOptions.accounts)
+    setAvailableFamilyMembers(localOptions.familyMembers)
     setForm(initialValue ? {
       amount: initialValue.amount, category: initialValue.category, description: initialValue.description,
       date: initialValue.date, accountId: initialValue.accountId, familyMemberId: initialValue.familyMemberId ?? '',
@@ -63,6 +72,21 @@ export function TransactionModal({ isOpen, type, accounts, familyMembers, initia
     setOcrAttachmentId(undefined)
     setIsSaving(false)
   }, [isOpen, type, accounts, familyMembers, initialValue, preferences.incomeCategories, preferences.expenseCategories])
+
+  useEffect(() => {
+    if (!isOpen || !user?.id) return
+    let active = true
+    void fetchTransactionFormOptions(user.id).then((remoteOptions) => {
+      if (!active) return
+      const options = mergeTransactionFormOptions({ accounts, familyMembers }, remoteOptions)
+      setAvailableAccounts(options.accounts)
+      setAvailableFamilyMembers(options.familyMembers)
+      setForm((current) => ({ ...current, ...resolveTransactionSelectionIds(current, options) }))
+    }).catch((loadError) => {
+      console.error('Unable to refresh transaction form options', loadError)
+    })
+    return () => { active = false }
+  }, [accounts, familyMembers, isOpen, user?.id])
 
   if (!isOpen) return null
 
@@ -155,9 +179,9 @@ export function TransactionModal({ isOpen, type, accounts, familyMembers, initia
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.date')}</label><input type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} className={inputClass} /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.account')}</label><select value={form.accountId} onChange={(event) => setForm({ ...form, accountId: event.target.value })} className={inputClass}>{accounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}</select></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.account')}</label><select value={form.accountId} onChange={(event) => setForm({ ...form, accountId: event.target.value })} className={inputClass}>{availableAccounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}</select></div>
           </div>
-          <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.familyMember')}</label><select value={form.familyMemberId} onChange={(event) => setForm({ ...form, familyMemberId: event.target.value })} className={inputClass}>{familyMembers.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></div>
+          <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.familyMember')}</label><select value={form.familyMemberId} onChange={(event) => setForm({ ...form, familyMemberId: event.target.value })} className={inputClass}>{availableFamilyMembers.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></div>
           {error ? <p className="text-sm text-rose-600" role="alert">{error}</p> : null}
           <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button type="button" onClick={onClose} className="min-h-12 rounded-xl border border-slate-200 bg-white px-4 py-3 font-medium text-slate-700 transition hover:bg-slate-50">{t('common.cancel')}</button>
