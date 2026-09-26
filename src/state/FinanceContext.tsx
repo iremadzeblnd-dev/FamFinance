@@ -182,10 +182,12 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<FinanceContextValue>(() => {
     const update = (next: FinanceStateData) => setState(next)
-    const activeMembersById = new Map(state.familyMembers.filter((member) => !member.archived).map((member) => [member.id, member]))
+    const membersById = new Map(state.familyMembers.map((member) => [member.id, member]))
     const validTransactions = state.transactions.filter((transaction) => {
-      const member = transaction.familyMemberId ? activeMembersById.get(transaction.familyMemberId) : undefined
-      return Boolean(member && (!member.createdAt || transaction.date >= member.createdAt))
+      if (!transaction.familyMemberId) return false
+      const member = membersById.get(transaction.familyMemberId)
+      if (!member) return true
+      return !member.archived && (!member.createdAt || transaction.date >= member.createdAt)
     })
     return {
       ...state,

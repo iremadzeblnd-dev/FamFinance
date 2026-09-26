@@ -23,7 +23,15 @@ export function resolveTransactionSelectionIds(
   options: TransactionFormOptions,
 ) {
   return {
-    accountId: options.accounts.some((account) => account.id === current.accountId) ? current.accountId : (options.accounts[0]?.id ?? ''),
-    familyMemberId: options.familyMembers.some((member) => member.id === current.familyMemberId) ? current.familyMemberId : (options.familyMembers[0]?.id ?? ''),
+    accountId: current.accountId || options.accounts[0]?.id || '',
+    familyMemberId: current.familyMemberId || options.familyMembers[0]?.id || '',
   }
+}
+
+export function transactionOptionInputValue(value: string, options: { id: string; name: string }[]) {
+  return options.find((option) => option.id === value)?.name ?? value
+}
+
+export function transactionOptionStoredValue(value: string, options: { id: string; name: string }[]) {
+  return options.find((option) => option.name === value)?.id ?? value
 }

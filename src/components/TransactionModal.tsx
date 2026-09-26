@@ -11,7 +11,7 @@ import { localeMap } from '../i18n/translations'
 import { defaultIncomeCategories } from '../data/categories'
 import { useAuth } from '../state/AuthContext'
 import { fetchTransactionFormOptions } from '../services/financeDatabase'
-import { mergeTransactionFormOptions, resolveTransactionSelectionIds } from '../utils/transactionForm'
+import { mergeTransactionFormOptions, resolveTransactionSelectionIds, transactionOptionInputValue, transactionOptionStoredValue } from '../utils/transactionForm'
 
 interface TransactionModalProps {
   isOpen: boolean
@@ -138,10 +138,12 @@ export function TransactionModal({ isOpen, type, accounts, familyMembers, initia
     if (!form.amount || form.amount <= 0) return setError(t('transaction.error.amount'))
     if (!form.category) return setError(t('transaction.category'))
     if (type === 'income' && !form.description.trim()) return setError(t('transaction.error.description'))
-    if (!form.accountId || !form.familyMemberId) return setError(t('transaction.error.people'))
+    const accountId = form.accountId.trim()
+    const familyMemberId = form.familyMemberId.trim()
+    if (!accountId || !familyMemberId) return setError(t('transaction.error.people'))
     setIsSaving(true)
     try {
-      await onSave({ ...form, description: type === 'expense' ? (form.description.trim() || form.category) : form.description.trim(), attachments: type === 'expense' ? form.attachments : [] })
+      await onSave({ ...form, accountId, familyMemberId, description: type === 'expense' ? (form.description.trim() || form.category) : form.description.trim(), attachments: type === 'expense' ? form.attachments : [] })
       onClose()
     } catch {
       setError(t('attachments.error.save'))
@@ -179,9 +181,9 @@ export function TransactionModal({ isOpen, type, accounts, familyMembers, initia
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.date')}</label><input type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} className={inputClass} /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.account')}</label><select value={form.accountId} onChange={(event) => setForm({ ...form, accountId: event.target.value })} className={inputClass}>{availableAccounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}</select></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.account')}</label><input list="transaction-account-options" value={transactionOptionInputValue(form.accountId, availableAccounts)} onChange={(event) => setForm({ ...form, accountId: transactionOptionStoredValue(event.target.value, availableAccounts) })} className={inputClass} autoComplete="off" /><datalist id="transaction-account-options">{availableAccounts.map((account) => <option key={account.id} value={account.name} />)}</datalist></div>
           </div>
-          <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.familyMember')}</label><select value={form.familyMemberId} onChange={(event) => setForm({ ...form, familyMemberId: event.target.value })} className={inputClass}>{availableFamilyMembers.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></div>
+          <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('transaction.familyMember')}</label><input list="transaction-family-member-options" value={transactionOptionInputValue(form.familyMemberId, availableFamilyMembers)} onChange={(event) => setForm({ ...form, familyMemberId: transactionOptionStoredValue(event.target.value, availableFamilyMembers) })} className={inputClass} autoComplete="off" /><datalist id="transaction-family-member-options">{availableFamilyMembers.map((member) => <option key={member.id} value={member.name} />)}</datalist></div>
           {error ? <p className="text-sm text-rose-600" role="alert">{error}</p> : null}
           <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button type="button" onClick={onClose} className="min-h-12 rounded-xl border border-slate-200 bg-white px-4 py-3 font-medium text-slate-700 transition hover:bg-slate-50">{t('common.cancel')}</button>

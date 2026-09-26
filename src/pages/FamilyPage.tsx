@@ -52,7 +52,7 @@ export function FamilyPage() {
       attachments.push({ id: attachment.id, name: attachment.name, type: attachment.type, size: attachment.size, category: attachment.category, lastModified: attachment.lastModified })
     }
     await saveAttachmentBlobs(blobs)
-    const input = { type: editingTransaction?.type ?? transactionType, amount: value.amount, category: value.category, description: value.description, date: value.date, accountId: value.accountId, familyMemberId: selectedMember?.id ?? value.familyMemberId, expenseScope: value.expenseScope, attachments, receiptAttachment: undefined }
+    const input = { type: editingTransaction?.type ?? transactionType, amount: value.amount, category: value.category, description: value.description, date: value.date, accountId: value.accountId, familyMemberId: value.familyMemberId, expenseScope: value.expenseScope, attachments, receiptAttachment: undefined }
     if (editingTransaction) updateTransaction(editingTransaction.id, input); else addTransaction(input)
     const retainedIds = new Set(attachments.map((attachment) => attachment.id))
     const removedIds = editingTransaction?.attachments?.filter((attachment) => !retainedIds.has(attachment.id)).map((attachment) => attachment.id) ?? []

@@ -23,8 +23,8 @@ export function TransactionsPage({ onEdit }: TransactionsPageProps) {
 
   const categories = Array.from(new Set(transactions.map((item) => item.category)))
   const filteredTransactions = useMemo(() => transactions.filter((item) => {
-    const account = accounts.find((entry) => entry.id === item.accountId)?.name ?? ''
-    const member = familyMembers.find((entry) => entry.id === item.familyMemberId)?.name ?? ''
+    const account = accounts.find((entry) => entry.id === item.accountId)?.name ?? item.accountId
+    const member = familyMembers.find((entry) => entry.id === item.familyMemberId)?.name ?? item.familyMemberId ?? ''
     const query = search.trim().toLocaleLowerCase('ka-GE')
     const matchesSearch = !query || [item.description, item.category, account, member].some((value) => value?.toLocaleLowerCase('ka-GE').includes(query))
     return matchesSearch && (type === 'all' || item.type === type) && (category === 'all' || item.category === category) && (accountId === 'all' || item.accountId === accountId) && (familyMemberId === 'all' || item.familyMemberId === familyMemberId)
